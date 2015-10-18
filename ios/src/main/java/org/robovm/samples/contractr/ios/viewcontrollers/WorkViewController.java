@@ -19,20 +19,18 @@ import net.engio.mbassy.listener.Handler;
 import org.robovm.apple.coreanimation.CALayer;
 import org.robovm.apple.dispatch.DispatchQueue;
 import org.robovm.apple.uikit.UIButton;
-import org.robovm.apple.uikit.UIButtonType;
 import org.robovm.apple.uikit.UIColor;
 import org.robovm.apple.uikit.UIControlState;
-import org.robovm.apple.uikit.UIEdgeInsets;
-import org.robovm.apple.uikit.UIFont;
 import org.robovm.apple.uikit.UILabel;
-import org.robovm.apple.uikit.UIView;
 import org.robovm.objc.annotation.CustomClass;
+import org.robovm.objc.annotation.IBAction;
+import org.robovm.objc.annotation.IBOutlet;
 import org.robovm.samples.contractr.core.ClientModel;
 import org.robovm.samples.contractr.core.Task;
 import org.robovm.samples.contractr.core.TaskModel;
 import org.robovm.samples.contractr.core.TaskModel.WorkStartedEvent;
 import org.robovm.samples.contractr.core.TaskModel.WorkStoppedEvent;
-import org.robovm.samples.contractr.ios.*;
+import org.robovm.samples.contractr.ios.ContractRApp;
 
 import javax.inject.Inject;
 import java.text.NumberFormat;
@@ -49,10 +47,10 @@ public class WorkViewController extends InjectedViewController {
     @Inject ClientModel clientModel;
     @Inject TaskModel taskModel;
 
-    private UIButton startStopButton;
-    private UILabel currentTaskLabel;
-    private UILabel earnedLabel;
-    private UILabel timerLabel;
+    @IBOutlet UIButton startStopButton;
+    @IBOutlet UILabel currentTaskLabel;
+    @IBOutlet UILabel earnedLabel;
+    @IBOutlet UILabel timerLabel;
     private boolean showing = true;
 
     public WorkViewController() {
@@ -73,71 +71,6 @@ public class WorkViewController extends InjectedViewController {
     }
 
     @Override
-    public void viewDidLoad() {
-        super.viewDidLoad();
-
-        UIView rootView = getView();
-        rootView.setBackgroundColor(UIColor.white());
-
-        startStopButton = new UIButton(UIButtonType.RoundedRect);
-        startStopButton.setContentEdgeInsets(new UIEdgeInsets(12, 30, 12, 30));
-        startStopButton.getTitleLabel().setFont(UIFont.getSystemFont(25));
-        startStopButton.addOnTouchUpInsideListener((c, e) -> startStopClicked());
-        startStopButton.setTranslatesAutoresizingMaskIntoConstraints(false);
-
-        UILabel currentTaskTitleLabel = new UILabel();
-        currentTaskTitleLabel.setText("Current Task");
-        currentTaskTitleLabel.setTranslatesAutoresizingMaskIntoConstraints(false);
-
-        currentTaskLabel = new UILabel();
-        currentTaskLabel.setText("None");
-        currentTaskLabel.setTranslatesAutoresizingMaskIntoConstraints(false);
-        currentTaskLabel.setFont(UIFont.getBoldSystemFont(25));
-
-        UILabel timerTitleLabel = new UILabel();
-        timerTitleLabel.setText("Time Elapsed");
-        timerTitleLabel.setTranslatesAutoresizingMaskIntoConstraints(false);
-
-        timerLabel = new UILabel();
-        timerLabel.setText("00:00:00");
-        timerLabel.setTranslatesAutoresizingMaskIntoConstraints(false);
-        timerLabel.setFont(UIFont.getBoldSystemFont(25));
-
-        UILabel earnedTitleLabel = new UILabel();
-        earnedTitleLabel.setText("Amount Earned");
-        earnedTitleLabel.setTranslatesAutoresizingMaskIntoConstraints(false);
-
-        earnedLabel = new UILabel();
-        earnedLabel.setText("0");
-        earnedLabel.setTranslatesAutoresizingMaskIntoConstraints(false);
-        earnedLabel.setFont(UIFont.getBoldSystemFont(25));
-
-        rootView.addSubview(currentTaskTitleLabel);
-        rootView.addSubview(currentTaskLabel);
-        rootView.addSubview(timerTitleLabel);
-        rootView.addSubview(timerLabel);
-        rootView.addSubview(earnedTitleLabel);
-        rootView.addSubview(earnedLabel);
-        rootView.addSubview(timerLabel);
-        rootView.addSubview(startStopButton);
-
-        rootView.addConstraint(NSLayoutConstraintUtil.centerHorizontally(currentTaskTitleLabel, rootView, 1.0, 0));
-        rootView.addConstraint(NSLayoutConstraintUtil.centerVertically(currentTaskTitleLabel, rootView, 0.4, -20));
-        rootView.addConstraint(NSLayoutConstraintUtil.centerHorizontally(currentTaskLabel, rootView, 1.0, 0));
-        rootView.addConstraint(NSLayoutConstraintUtil.centerVertically(currentTaskLabel, rootView, 0.4, 10));
-        rootView.addConstraint(NSLayoutConstraintUtil.centerHorizontally(timerTitleLabel, rootView, 1.0, 0));
-        rootView.addConstraint(NSLayoutConstraintUtil.centerVertically(timerTitleLabel, rootView, 0.8, -20));
-        rootView.addConstraint(NSLayoutConstraintUtil.centerHorizontally(timerLabel, rootView, 1.0, 0));
-        rootView.addConstraint(NSLayoutConstraintUtil.centerVertically(timerLabel, rootView, 0.8, 10));
-        rootView.addConstraint(NSLayoutConstraintUtil.centerHorizontally(earnedTitleLabel, rootView, 1.0, 0));
-        rootView.addConstraint(NSLayoutConstraintUtil.centerVertically(earnedTitleLabel, rootView, 1.2, -20));
-        rootView.addConstraint(NSLayoutConstraintUtil.centerHorizontally(earnedLabel, rootView, 1.0, 0));
-        rootView.addConstraint(NSLayoutConstraintUtil.centerVertically(earnedLabel, rootView, 1.2, 10));
-        rootView.addConstraint(NSLayoutConstraintUtil.centerHorizontally(startStopButton, rootView, 1.0, 0));
-        rootView.addConstraint(NSLayoutConstraintUtil.centerVertically(startStopButton, rootView, 1.6, -10));
-    }
-
-    @Override
     public void viewWillAppear(boolean animated) {
         super.viewWillAppear(animated);
         showing = true;
@@ -151,7 +84,7 @@ public class WorkViewController extends InjectedViewController {
         super.viewWillDisappear(animated);
     }
 
-    private void startStopClicked() {
+    @IBAction void startStopClicked() {
         Task workingTask = taskModel.getWorkingTask();
         if (workingTask == null) {
             performSegue("selectTaskSegue", this);
