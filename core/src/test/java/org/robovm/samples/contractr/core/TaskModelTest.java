@@ -15,25 +15,25 @@
  */
 package org.robovm.samples.contractr.core;
 
-import static org.junit.Assert.*;
+import net.engio.mbassy.listener.Handler;
+import org.junit.Before;
+import org.junit.Test;
+import org.robovm.samples.contractr.core.TaskModel.SelectedTaskChangedEvent;
+import org.robovm.samples.contractr.core.TaskModel.TaskDeletedEvent;
+import org.robovm.samples.contractr.core.TaskModel.TaskSavedEvent;
+import org.robovm.samples.contractr.core.TaskModel.WorkStartedEvent;
+import org.robovm.samples.contractr.core.TaskModel.WorkStoppedEvent;
+import org.robovm.samples.contractr.core.service.TestClient;
+import org.robovm.samples.contractr.core.service.TestClientManager;
+import org.robovm.samples.contractr.core.service.TestTask;
+import org.robovm.samples.contractr.core.service.TestTaskManager;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import net.engio.mbassy.listener.Handler;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.robovm.samples.contractr.core.Task;
-import org.robovm.samples.contractr.core.TaskModel;
-import org.robovm.samples.contractr.core.TaskModel.SelectedTaskChangedEvent;
-import org.robovm.samples.contractr.core.TaskModel.TaskDeletedEvent;
-import org.robovm.samples.contractr.core.TaskModel.TaskSavedEvent;
-import org.robovm.samples.contractr.core.service.TestClient;
-import org.robovm.samples.contractr.core.service.TestTask;
-import org.robovm.samples.contractr.core.service.TestTaskManager;
+import static org.junit.Assert.*;
 
 /**
  * Tests {@link TaskModel}.
@@ -62,6 +62,16 @@ public class TaskModelTest {
         events.add(event);
     }
 
+    @Handler
+    public void workStarted(WorkStartedEvent event) {
+        events.add(event);
+    }
+
+    @Handler
+    public void workStopped(WorkStoppedEvent event) {
+        events.add(event);
+    }
+
     @Before
     public void setup() {
         client = new TestClient("Client", BigDecimal.ZERO);
@@ -71,7 +81,7 @@ public class TaskModelTest {
         taskManager = new TestTaskManager();
         taskManager.tasks.add(task1);
         taskManager.tasks.add(task2);
-        model = new TaskModel(taskManager);
+        model = new TaskModel(new ClientModel(new TestClientManager()), taskManager);
         model.subscribe(this);
         events = new ArrayList<>();
     }
@@ -203,6 +213,8 @@ public class TaskModelTest {
     public void testGetWorkingTask() throws Exception {
         assertNull(model.getWorkingTask());
         model.startWork(task1);
+        assertTrue(events.get(0) instanceof WorkStartedEvent);
+        assertEquals(task1, ((WorkStartedEvent) events.get(0)).getTask());
         assertEquals(task1, model.getWorkingTask());
         assertNotNull(model.getWorkingTask());
         assertNotNull(task1.getWorkStartTime());
@@ -210,6 +222,8 @@ public class TaskModelTest {
         long end1 = start1 + 5 * 1000;
         task1.setWorkStartTime(new Date(start1));
         model.stopWork(end1);
+        assertTrue(events.get(1) instanceof WorkStoppedEvent);
+        assertEquals(task1, ((WorkStoppedEvent) events.get(1)).getTask());
         assertNull(model.getWorkingTask());
         assertNull(task1.getWorkStartTime());
         assertEquals(5, task1.getSecondsWorked());

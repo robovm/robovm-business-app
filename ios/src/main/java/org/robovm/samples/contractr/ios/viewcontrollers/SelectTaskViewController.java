@@ -13,84 +13,60 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.robovm.samples.contractr.ios;
+package org.robovm.samples.contractr.ios.viewcontrollers;
 
 import org.robovm.apple.foundation.NSIndexPath;
-import org.robovm.apple.uikit.NSIndexPathExtensions;
-import org.robovm.apple.uikit.UIBarButtonItem;
-import org.robovm.apple.uikit.UIBarButtonItem.OnClickListener;
-import org.robovm.apple.uikit.UIBarButtonSystemItem;
 import org.robovm.apple.uikit.UITableView;
 import org.robovm.apple.uikit.UITableViewCell;
 import org.robovm.apple.uikit.UITableViewCellAccessoryType;
 import org.robovm.apple.uikit.UITableViewCellStyle;
-import org.robovm.apple.uikit.UITableViewController;
+import org.robovm.objc.annotation.CustomClass;
+import org.robovm.objc.annotation.IBAction;
 import org.robovm.samples.contractr.core.Client;
 import org.robovm.samples.contractr.core.ClientModel;
 import org.robovm.samples.contractr.core.Task;
 import org.robovm.samples.contractr.core.TaskModel;
 
+import javax.inject.Inject;
+
 /**
  * 
  */
-public class SelectTaskViewController extends UITableViewController {
-    private final ClientModel clientModel;
-    private final TaskModel taskModel;
-    private final Runnable onDone;
-    private Task selectedTask;
+@CustomClass("SelectTaskViewController")
+public class SelectTaskViewController extends InjectedTableViewController {
+    @Inject ClientModel clientModel;
+    @Inject TaskModel taskModel;
 
-    public SelectTaskViewController(ClientModel clientModel, TaskModel taskModel, Runnable onDone) {
-        this.clientModel = clientModel;
-        this.taskModel = taskModel;
-        this.onDone = onDone;
-    }
-
-    @Override
-    public void viewDidLoad() {
-        super.viewDidLoad();
-
-        getNavigationItem().setLeftBarButtonItem(
-                new UIBarButtonItem(UIBarButtonSystemItem.Cancel, new OnClickListener() {
-                    @Override
-                    public void onClick(UIBarButtonItem barButtonItem) {
-                        selectedTask = null;
-                        dismissViewController(true, null);
-                    }
-                }));
+    @IBAction
+    private void cancel() {
+        dismissViewController(true, null);
     }
 
     @Override
     public void viewWillAppear(boolean animated) {
         super.viewWillAppear(animated);
-        selectedTask = null;
         getTableView().reloadData();
     }
 
-    public Task getSelectedTask() {
-        return selectedTask;
+    private Task getTaskForRow(NSIndexPath indexPath) {
+        Client client = clientModel.get(indexPath.getSection());
+        return taskModel.getForClient(client, true).get(indexPath.getRow());
     }
 
     @Override
     public void didSelectRow(UITableView tableView, NSIndexPath indexPath) {
-        int section = (int) NSIndexPathExtensions.getSection(indexPath);
-        int row = (int) NSIndexPathExtensions.getRow(indexPath);
-        Client client = clientModel.get(section);
-        selectedTask = taskModel.getForClient(client, true).get(row);
-        onDone.run();
+        taskModel.startWork(getTaskForRow(indexPath));
         dismissViewController(true, null);
     }
 
     @Override
     public UITableViewCell getCellForRow(UITableView tableView, NSIndexPath indexPath) {
-        int section = (int) NSIndexPathExtensions.getSection(indexPath);
-        int row = (int) NSIndexPathExtensions.getRow(indexPath);
         UITableViewCell cell = tableView.dequeueReusableCell("cell");
         if (cell == null) {
             cell = new UITableViewCell(UITableViewCellStyle.Value1, "cell");
             cell.setAccessoryType(UITableViewCellAccessoryType.DisclosureIndicator);
         }
-        Client client = clientModel.get(section);
-        Task task = taskModel.getForClient(client, true).get(row);
+        Task task = getTaskForRow(indexPath);
         cell.getTextLabel().setText(task.getTitle());
         cell.getDetailTextLabel().setText(task.getTimeElapsed());
         return cell;

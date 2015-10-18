@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.robovm.samples.contractr.ios;
+package org.robovm.samples.contractr.ios.viewcontrollers;
 
 import org.robovm.apple.foundation.NSArray;
 import org.robovm.apple.foundation.NSAttributedString;
@@ -26,34 +26,29 @@ import org.robovm.apple.uikit.UITableViewCell;
 import org.robovm.apple.uikit.UITableViewCellAccessoryType;
 import org.robovm.apple.uikit.UITableViewCellStyle;
 import org.robovm.apple.uikit.UITableViewRowAnimation;
+import org.robovm.objc.annotation.CustomClass;
 import org.robovm.samples.contractr.core.Client;
 import org.robovm.samples.contractr.core.ClientModel;
 import org.robovm.samples.contractr.core.Task;
 import org.robovm.samples.contractr.core.TaskModel;
 
+import javax.inject.Inject;
+
 /**
  * 
  */
+@CustomClass("TasksViewController")
 public class TasksViewController extends ListViewController {
 
-    private final AddTaskViewController addTaskViewController;
-    private final EditTaskViewController editTaskViewController;
-    private final ClientModel clientModel;
-    private final TaskModel taskModel;
-    private final org.robovm.apple.uikit.NSAttributedStringAttributes strikeThroughAttrs;
+    private static final NSAttributedStringAttributes strikeThroughAttrs;
 
-    public TasksViewController(ClientModel clientModel, TaskModel taskModel,
-            AddTaskViewController addTaskViewController,
-            EditTaskViewController editTaskViewController) {
-
-        this.clientModel = clientModel;
-        this.taskModel = taskModel;
-        this.addTaskViewController = addTaskViewController;
-        this.editTaskViewController = editTaskViewController;
-
-        this.strikeThroughAttrs = new NSAttributedStringAttributes();
-        this.strikeThroughAttrs.setStrikethroughStyle(NSUnderlineStyle.StyleSingle);
+    static {
+        strikeThroughAttrs = new NSAttributedStringAttributes();
+        strikeThroughAttrs.setStrikethroughStyle(NSUnderlineStyle.StyleSingle);
     }
+
+    @Inject ClientModel clientModel;
+    @Inject TaskModel taskModel;
 
     @Override
     public void viewDidLoad() {
@@ -64,15 +59,18 @@ public class TasksViewController extends ListViewController {
 
     @Override
     protected void onAdd() {
-        getNavigationController().pushViewController(addTaskViewController, true);
+        clientModel.selectClient(null);
+        taskModel.selectTask(null);
+        performSegue("editTaskSegue", this);
     }
 
     @Override
     protected void onEdit(int section, int row) {
         Client client = clientModel.get(section);
         Task task = taskModel.getForClient(client, false).get(row);
-        editTaskViewController.setTask(task);
-        getNavigationController().pushViewController(editTaskViewController, true);
+        clientModel.selectClient(client);
+        taskModel.selectTask(task);
+        performSegue("editTaskSegue", this);
     }
 
     @Override
@@ -87,15 +85,13 @@ public class TasksViewController extends ListViewController {
 
     @Override
     public UITableViewCell getCellForRow(UITableView tableView, NSIndexPath indexPath) {
-        int section = (int) NSIndexPathExtensions.getSection(indexPath);
-        int row = (int) NSIndexPathExtensions.getRow(indexPath);
         UITableViewCell cell = tableView.dequeueReusableCell("cell");
         if (cell == null) {
             cell = new UITableViewCell(UITableViewCellStyle.Value1, "cell");
             cell.setAccessoryType(UITableViewCellAccessoryType.DisclosureIndicator);
         }
-        Client client = clientModel.get(section);
-        Task task = taskModel.getForClient(client, false).get(row);
+        Client client = clientModel.get(indexPath.getSection());
+        Task task = taskModel.getForClient(client, false).get(indexPath.getRow());
         String title = task.getTitle();
         if (task.isFinished()) {
             NSAttributedString attributedTitle = new NSAttributedString(title, strikeThroughAttrs);

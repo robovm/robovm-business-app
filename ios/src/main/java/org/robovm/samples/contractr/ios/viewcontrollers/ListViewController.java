@@ -13,55 +13,46 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.robovm.samples.contractr.ios;
+package org.robovm.samples.contractr.ios.viewcontrollers;
 
+import org.robovm.apple.foundation.NSArray;
 import org.robovm.apple.foundation.NSIndexPath;
-import org.robovm.apple.uikit.NSIndexPathExtensions;
 import org.robovm.apple.uikit.UIBarButtonItem;
-import org.robovm.apple.uikit.UIBarButtonItem.OnClickListener;
-import org.robovm.apple.uikit.UIBarButtonSystemItem;
 import org.robovm.apple.uikit.UITableView;
 import org.robovm.apple.uikit.UITableViewCellEditingStyle;
 import org.robovm.apple.uikit.UITableViewController;
+import org.robovm.objc.annotation.CustomClass;
+import org.robovm.objc.annotation.IBAction;
+import org.robovm.objc.annotation.IBOutlet;
 
 /**
  * Abstract {@link UITableViewController} which displays a list of objects and
  * supports adding and removing objects.
  */
-public abstract class ListViewController extends UITableViewController {
+@CustomClass("ListViewController")
+public abstract class ListViewController extends InjectedTableViewController {
 
-    private UIBarButtonItem editBarButtonItem;
-    private UIBarButtonItem doneBarButtonItem;
+    @IBOutlet UIBarButtonItem editBarButtonItem;
+    @IBOutlet UIBarButtonItem doneBarButtonItem;
 
-    @Override
-    public void viewDidLoad() {
-        super.viewDidLoad();
+    @IBAction
+    private void add() {
+        onAdd();
+    }
 
-        getNavigationItem().setRightBarButtonItem(new UIBarButtonItem(UIBarButtonSystemItem.Add,
-                new OnClickListener() {
-                    @Override
-                    public void onClick(UIBarButtonItem barButtonItem) {
-                        onAdd();
-                    }
-                }));
+    @IBAction
+    private void edit() {
+        setEditing(true, true);
+    }
 
-        editBarButtonItem = new UIBarButtonItem(UIBarButtonSystemItem.Edit, new OnClickListener() {
-            @Override
-            public void onClick(UIBarButtonItem barButtonItem) {
-                setEditing(true, true);
-            }
-        });
-        doneBarButtonItem = new UIBarButtonItem(UIBarButtonSystemItem.Done, new OnClickListener() {
-            @Override
-            public void onClick(UIBarButtonItem barButtonItem) {
-                setEditing(false, true);
-            }
-        });
-        getNavigationItem().setLeftBarButtonItem(editBarButtonItem);
+    @IBAction
+    private void done() {
+        setEditing(false, true);
     }
 
     @Override
     public void setEditing(boolean editing, boolean animated) {
+        getNavigationItem().setLeftBarButtonItems(new NSArray<>());
         if (editing) {
             getNavigationItem().setLeftBarButtonItem(doneBarButtonItem);
         } else {
@@ -86,8 +77,7 @@ public abstract class ListViewController extends UITableViewController {
 
     @Override
     public void didSelectRow(UITableView tableView, NSIndexPath indexPath) {
-        onEdit((int) NSIndexPathExtensions.getSection(indexPath),
-                (int) NSIndexPathExtensions.getRow(indexPath));
+        onEdit(indexPath.getSection(), indexPath.getRow());
     }
 
     @Override
@@ -100,8 +90,7 @@ public abstract class ListViewController extends UITableViewController {
             NSIndexPath indexPath) {
 
         if (editingStyle == UITableViewCellEditingStyle.Delete) {
-            onDelete((int) NSIndexPathExtensions.getSection(indexPath),
-                    (int) NSIndexPathExtensions.getRow(indexPath));
+            onDelete(indexPath.getSection(), indexPath.getRow());
         }
     }
 }

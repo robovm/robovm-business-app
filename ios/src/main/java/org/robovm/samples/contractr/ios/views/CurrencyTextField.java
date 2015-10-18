@@ -13,27 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.robovm.samples.contractr.ios;
+package org.robovm.samples.contractr.ios.views;
+
+import org.robovm.apple.foundation.NSCoder;
+import org.robovm.apple.foundation.NSRange;
+import org.robovm.apple.uikit.UIControlEvents;
+import org.robovm.apple.uikit.UIKeyboardType;
+import org.robovm.apple.uikit.UITextField;
+import org.robovm.apple.uikit.UITextFieldDelegateAdapter;
+import org.robovm.apple.uikit.UITextPosition;
+import org.robovm.objc.annotation.CustomClass;
 
 import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.util.Locale;
 
-import org.robovm.apple.foundation.NSRange;
-import org.robovm.apple.uikit.UIControlEvents;
-import org.robovm.apple.uikit.UITextField;
-import org.robovm.apple.uikit.UITextFieldDelegateAdapter;
-import org.robovm.apple.uikit.UITextPosition;
-
 /**
  * 
  */
-public class UICurrencyTextField extends UITextField {
+@CustomClass("CurrencyTextField")
+public class CurrencyTextField extends UITextField {
 
     private final NumberFormat formatter;
     
-    public UICurrencyTextField() {
+    public CurrencyTextField(NSCoder coder) {
+        super(coder);
         formatter = NumberFormat.getCurrencyInstance(Locale.US);
+        setKeyboardType(UIKeyboardType.DecimalPad);
         
         setDelegate(new UITextFieldDelegateAdapter() {
             @Override

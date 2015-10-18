@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.robovm.samples.contractr.ios;
+package org.robovm.samples.contractr.ios.viewcontrollers;
 
 import org.robovm.apple.foundation.NSArray;
 import org.robovm.apple.foundation.NSIndexPath;
@@ -23,25 +23,19 @@ import org.robovm.apple.uikit.UITableViewCell;
 import org.robovm.apple.uikit.UITableViewCellAccessoryType;
 import org.robovm.apple.uikit.UITableViewCellStyle;
 import org.robovm.apple.uikit.UITableViewRowAnimation;
+import org.robovm.objc.annotation.CustomClass;
 import org.robovm.samples.contractr.core.Client;
 import org.robovm.samples.contractr.core.ClientModel;
+
+import javax.inject.Inject;
 
 /**
  * 
  */
+@CustomClass("ClientsViewController")
 public class ClientsViewController extends ListViewController {
 
-    private final AddClientViewController addClientViewController;
-    private final EditClientViewController editClientViewController;
-    private final ClientModel clientModel;
-
-    public ClientsViewController(ClientModel clientModel, AddClientViewController addClientViewController,
-            EditClientViewController editClientViewController) {
-
-        this.clientModel = clientModel;
-        this.addClientViewController = addClientViewController;
-        this.editClientViewController = editClientViewController;
-    }
+    @Inject ClientModel clientModel;
 
     @Override
     public void viewDidLoad() {
@@ -52,14 +46,14 @@ public class ClientsViewController extends ListViewController {
 
     @Override
     protected void onAdd() {
-        getNavigationController().pushViewController(addClientViewController, true);
+        clientModel.selectClient(null);
+        performSegue("editClientSegue", this);
     }
 
     @Override
     protected void onEdit(int section, int row) {
-        Client client = clientModel.get(row);
-        editClientViewController.setClient(client);
-        getNavigationController().pushViewController(editClientViewController, true);
+        clientModel.selectClient(clientModel.get(row));
+        performSegue("editClientSegue", this);
     }
 
     @Override

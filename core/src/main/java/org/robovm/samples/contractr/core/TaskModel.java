@@ -15,17 +15,16 @@
  */
 package org.robovm.samples.contractr.core;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
-
 import net.engio.mbassy.bus.MBassador;
 import net.engio.mbassy.bus.config.BusConfiguration;
 import net.engio.mbassy.bus.config.Feature;
 import net.engio.mbassy.listener.Handler;
-
 import org.robovm.samples.contractr.core.ClientModel.SelectedClientChangedEvent;
 import org.robovm.samples.contractr.core.service.TaskManager;
+
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * Model for {@link Task} objects. Supports the use cases the controllers in the
@@ -42,12 +41,13 @@ public class TaskModel {
      * Creates a new {@link TaskModel} backed by the specified
      * {@link TaskManager}.
      */
-    public TaskModel(TaskManager taskManager) {
+    public TaskModel(ClientModel clientModel, TaskManager taskManager) {
         this.taskManager = Objects.requireNonNull(taskManager, "taskManager");
         this.bus = new MBassador<Object>(new BusConfiguration()
                 .addFeature(Feature.SyncPubSub.Default())
                 .addFeature(Feature.AsynchronousHandlerInvocation.Default())
                 .addFeature(Feature.AsynchronousMessageDispatch.Default()));
+        clientModel.subscribe(this);
     }
 
     @Handler
@@ -170,6 +170,7 @@ public class TaskModel {
         }
         stopWork();
         task.setWorkStartTime(new Date());
+        bus.publish(new WorkStartedEvent(task));
         taskManager.save(task);
     }
 
@@ -192,6 +193,7 @@ public class TaskModel {
         workingTask.setWorkStartTime(null);
         workingTask.addWorkUnit(startTime, endTime);
         taskManager.save(workingTask);
+        bus.publish(new WorkStoppedEvent(workingTask));
     }
 
     /**
@@ -237,6 +239,36 @@ public class TaskModel {
         private final Task task;
 
         TaskDeletedEvent(Task task) {
+            this.task = task;
+        }
+
+        public Task getTask() {
+            return task;
+        }
+    }
+
+    /**
+     * Event fired when work is started on a {@link Task}.
+     */
+    public static class WorkStartedEvent {
+        private final Task task;
+
+        WorkStartedEvent(Task task) {
+            this.task = task;
+        }
+
+        public Task getTask() {
+            return task;
+        }
+    }
+
+    /**
+     * Event fired when work is stopped on a {@link Task}.
+     */
+    public static class WorkStoppedEvent {
+        private final Task task;
+
+        WorkStoppedEvent(Task task) {
             this.task = task;
         }
 

@@ -13,12 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.robovm.samples.contractr.ios;
+package org.robovm.samples.contractr.ios.viewcontrollers;
 
-import java.text.NumberFormat;
-import java.util.Locale;
-import java.util.concurrent.TimeUnit;
-
+import net.engio.mbassy.listener.Handler;
 import org.robovm.apple.coreanimation.CALayer;
 import org.robovm.apple.dispatch.DispatchQueue;
 import org.robovm.apple.uikit.UIButton;
@@ -28,22 +25,29 @@ import org.robovm.apple.uikit.UIControlState;
 import org.robovm.apple.uikit.UIEdgeInsets;
 import org.robovm.apple.uikit.UIFont;
 import org.robovm.apple.uikit.UILabel;
-import org.robovm.apple.uikit.UINavigationController;
 import org.robovm.apple.uikit.UIView;
-import org.robovm.apple.uikit.UIViewController;
+import org.robovm.objc.annotation.CustomClass;
 import org.robovm.samples.contractr.core.ClientModel;
 import org.robovm.samples.contractr.core.Task;
 import org.robovm.samples.contractr.core.TaskModel;
+import org.robovm.samples.contractr.core.TaskModel.WorkStartedEvent;
+import org.robovm.samples.contractr.core.TaskModel.WorkStoppedEvent;
+import org.robovm.samples.contractr.ios.*;
 
-public class WorkViewController extends UIViewController {
+import javax.inject.Inject;
+import java.text.NumberFormat;
+import java.util.Locale;
+import java.util.concurrent.TimeUnit;
+
+@CustomClass("WorkViewController")
+public class WorkViewController extends InjectedViewController {
 
     private static final UIColor START_COLOR = ContractRApp.HIGHLIGHT_COLOR;
     private static final UIColor STOP_COLOR =
             UIColor.fromRGBA(1.0, 0, 0, 1.0);
 
-    private final TaskModel taskModel;
-    private SelectTaskViewController selectTaskViewController;
-    private final UINavigationController selectTaskNavigationController;
+    @Inject ClientModel clientModel;
+    @Inject TaskModel taskModel;
 
     private UIButton startStopButton;
     private UILabel currentTaskLabel;
@@ -51,12 +55,21 @@ public class WorkViewController extends UIViewController {
     private UILabel timerLabel;
     private boolean showing = true;
 
-    public WorkViewController(ClientModel clientModel, TaskModel taskModel) {
-        this.taskModel = taskModel;
-        this.selectTaskViewController = new SelectTaskViewController(clientModel, taskModel,
-                () -> start(this.selectTaskViewController.getSelectedTask()));
-        this.selectTaskNavigationController = new UINavigationController(this.selectTaskViewController);
-        this.selectTaskViewController.getNavigationItem().setTitle("Task to work on");
+    public WorkViewController() {
+        taskModel.subscribe(this);
+    }
+
+    @Handler
+    public void workStarted(WorkStartedEvent event) {
+        DispatchQueue.getMainQueue().async(this::updateUIComponents);
+    }
+
+    @Handler
+    public void workStopped(WorkStoppedEvent event) {
+        DispatchQueue.getMainQueue().async(() -> {
+            updateUIComponents();
+            tick(); // Resets timer to 00:00:00
+        });
     }
 
     @Override
@@ -141,9 +154,9 @@ public class WorkViewController extends UIViewController {
     private void startStopClicked() {
         Task workingTask = taskModel.getWorkingTask();
         if (workingTask == null) {
-            presentViewController(selectTaskNavigationController, true, null);
+            performSegue("selectTaskSegue", this);
         } else {
-            stop();
+            taskModel.stopWork();
         }
     }
 
@@ -167,17 +180,6 @@ public class WorkViewController extends UIViewController {
         layer.setBorderWidth(1.0);
         layer.setBorderColor(startStopColor.getCGColor());
         currentTaskLabel.setText(currentTaskText);
-    }
-
-    private void start(Task task) {
-        taskModel.startWork(task);
-        updateUIComponents();
-    }
-
-    private void stop() {
-        taskModel.stopWork();
-        updateUIComponents();
-        tick(); // Resets timer to 00:00:00
     }
 
     private void tick() {

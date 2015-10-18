@@ -2,7 +2,6 @@
   <executableName>${app.executable}</executableName>
   <mainClass>${app.mainclass}</mainClass>
   <os>ios</os>
-  <arch>thumbv7</arch>
   <resources>
     <resource>
       <directory>resources</directory>
@@ -12,6 +11,7 @@
   <iosInfoPList>Info.plist.xml</iosInfoPList>
   <forceLinkClasses>
     <pattern>SQLite.**</pattern>
+    <pattern>org.robovm.samples.contractr.**</pattern>
   </forceLinkClasses>
   <libs>
     <lib>lib/libiOSPlot.a</lib>

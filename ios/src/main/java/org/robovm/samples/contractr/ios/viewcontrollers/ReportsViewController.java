@@ -13,15 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.robovm.samples.contractr.ios;
+package org.robovm.samples.contractr.ios.viewcontrollers;
 
 import org.robovm.apple.foundation.NSMutableArray;
 import org.robovm.apple.uikit.UIColor;
 import org.robovm.apple.uikit.UIView;
 import org.robovm.apple.uikit.UIViewController;
+import org.robovm.objc.annotation.CustomClass;
+import org.robovm.samples.contractr.ios.NSLayoutConstraintUtil;
 import org.robovm.samples.contractr.ios.iosplot.PCPieChart;
 import org.robovm.samples.contractr.ios.iosplot.PCPieComponent;
 
+@CustomClass("ReportsViewController")
 public class ReportsViewController extends UIViewController {
 
     private static final UIColor[] colors = new UIColor[] {

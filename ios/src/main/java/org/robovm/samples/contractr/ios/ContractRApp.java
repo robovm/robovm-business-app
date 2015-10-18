@@ -15,11 +15,9 @@
  */
 package org.robovm.samples.contractr.ios;
 
-import java.io.File;
-
 import org.robovm.apple.coregraphics.CGRect;
 import org.robovm.apple.coregraphics.CGSize;
-import org.robovm.apple.foundation.Foundation;
+import org.robovm.apple.foundation.NSArray;
 import org.robovm.apple.foundation.NSAttributedString;
 import org.robovm.apple.foundation.NSAutoreleasePool;
 import org.robovm.apple.uikit.NSAttributedStringAttributes;
@@ -33,21 +31,11 @@ import org.robovm.apple.uikit.UIFont;
 import org.robovm.apple.uikit.UIGraphics;
 import org.robovm.apple.uikit.UIImage;
 import org.robovm.apple.uikit.UINavigationBar;
-import org.robovm.apple.uikit.UINavigationController;
-import org.robovm.apple.uikit.UIScreen;
 import org.robovm.apple.uikit.UISwitch;
 import org.robovm.apple.uikit.UITabBar;
-import org.robovm.apple.uikit.UITabBarController;
-import org.robovm.apple.uikit.UITabBarControllerDelegateAdapter;
-import org.robovm.apple.uikit.UITabBarItem;
 import org.robovm.apple.uikit.UITableView;
 import org.robovm.apple.uikit.UIViewController;
-import org.robovm.apple.uikit.UIWindow;
-import org.robovm.samples.contractr.core.ClientModel;
-import org.robovm.samples.contractr.core.TaskModel;
-import org.robovm.samples.contractr.core.service.JdbcClientManager;
-import org.robovm.samples.contractr.core.service.JdbcTaskManager;
-import org.robovm.samples.contractr.core.service.SingletonConnectionPool;
+import org.robovm.samples.contractr.ios.viewcontrollers.RootViewController;
 
 /**
  * App entry point.
@@ -57,98 +45,28 @@ public class ContractRApp extends UIApplicationDelegateAdapter {
     public static final UIColor HIGHLIGHT_COLOR = 
             UIColor.fromRGBA(0x93 / 255.0, 0xc6 / 255.0, 0x23 / 255.0, 1.0);
 
-    private UITabBarController tabBarController;
-    private WorkViewController workViewController;
-    private TasksViewController tasksViewController;
-    private ClientsViewController clientsViewController;
-    private ClientModel clientModel;
-    private TaskModel taskModel;
+    private static ContractRComponent component;
+
+    public static ContractRComponent getComponent() {
+        return component;
+    }
 
     @Override
     public boolean didFinishLaunching(UIApplication application,
             UIApplicationLaunchOptions launchOptions) {
 
-        /*
-         * Prevent this Java UIApplicationDelegate instance and every Java
-         * object reachable from it from being garbage collected until the
-         * Objective-C UIApplication instance is deallocated.
-         */
-        application.addStrongRef(this);
-
-        /*
-         * Initialize the models. The SQLite database is kept in
-         * <Application_Home>/Documents/db.sqlite. This directory is backed up
-         * by iTunes. See http://goo.gl/BWlCGN for Apple's docs on the iOS file
-         * system. 
-         */
-        try {
-            Class.forName("SQLite.JDBCDriver");
-        } catch (ClassNotFoundException e) {
-            throw new Error(e);
-        }
-        File dbFile = new File(System.getenv("HOME"), "Documents/db.sqlite");
-        dbFile.getParentFile().mkdirs();
-        Foundation.log("Using db in file: " + dbFile.getAbsolutePath());
-        SingletonConnectionPool connectionPool = new SingletonConnectionPool(
-                "jdbc:sqlite:" + dbFile.getAbsolutePath());
-        JdbcClientManager clientManager = new JdbcClientManager(connectionPool);
-        JdbcTaskManager taskManager = new JdbcTaskManager(connectionPool);
-        clientManager.setTaskManager(taskManager);
-        taskManager.setClientManager(clientManager);
-        clientModel = new ClientModel(clientManager);
-        taskModel = new TaskModel(taskManager);
-
-        /*
-         * Create view controllers. We make them reachable from this
-         * UIApplicationDelegate instance to prevent them from being GCed
-         * prematurely.
-         */
-        workViewController = new WorkViewController(clientModel, taskModel);
-        UIViewController reportsViewController = new ReportsViewController();
-        clientsViewController = new ClientsViewController(clientModel,
-                new AddClientViewController(clientModel), 
-                new EditClientViewController(clientModel));
-        tasksViewController = new TasksViewController(clientModel, taskModel,
-                new AddTaskViewController(clientModel, taskModel), 
-                new EditTaskViewController(clientModel, taskModel));
-
+        /* Render tab bar images from the Ionicons TTF font. */
+        RootViewController rootViewController = (RootViewController) getWindow().getRootViewController();
         UIFont ioniconsFont = UIFont.getFont("Ionicons", 30.0);
         UIImage workIconImage = createIconImage(ioniconsFont, '\uf1e1');
         UIImage reportsIconImage = createIconImage(ioniconsFont, '\uf2b5');
         UIImage clientsIconImage = createIconImage(ioniconsFont, '\uf1bf');
         UIImage tasksIconImage = createIconImage(ioniconsFont, '\uf16c');
-        
-        workViewController.setTabBarItem(new UITabBarItem("Work", workIconImage, 0));
-        UINavigationController clientsNavigationController = new UINavigationController(
-                clientsViewController);
-        
-        reportsViewController.setTabBarItem(new UITabBarItem("Reports", reportsIconImage, 0));
-        
-        clientsNavigationController.setTabBarItem(new UITabBarItem("Clients", clientsIconImage, 0));
-
-        UINavigationController tasksNavigationController = new UINavigationController(
-                tasksViewController);
-        tasksNavigationController.setTabBarItem(new UITabBarItem("Tasks", tasksIconImage, 0));
-
-        tabBarController = new UITabBarController();
-        tabBarController.addChildViewController(workViewController);
-        tabBarController.addChildViewController(reportsViewController);
-        tabBarController.addChildViewController(clientsNavigationController);
-        tabBarController.addChildViewController(tasksNavigationController);
-        tabBarController.setSelectedIndex(0);
-        tabBarController.setDelegate(new UITabBarControllerDelegateAdapter() {
-            @Override
-            public void didSelectViewController(UITabBarController tabBarController, UIViewController viewController) {
-                if (viewController instanceof UINavigationController) {
-                    ((UINavigationController) viewController).popToRootViewController(false);
-                }
-            }
-            @Override
-            public boolean shouldSelectViewController(UITabBarController tabBarController,
-                    UIViewController viewController) {
-                return viewController != tabBarController.getSelectedViewController();
-            }
-        });
+        NSArray<UIViewController> viewControllers = rootViewController.getViewControllers();
+        viewControllers.get(0).getTabBarItem().setImage(workIconImage);
+        viewControllers.get(1).getTabBarItem().setImage(reportsIconImage);
+        viewControllers.get(2).getTabBarItem().setImage(clientsIconImage);
+        viewControllers.get(3).getTabBarItem().setImage(tasksIconImage);
 
         /* Customize the colors in the UI. */
         UITabBar appearanceTabBar = UIAppearance.getAppearance(UITabBar.class);
@@ -161,16 +79,6 @@ public class ContractRApp extends UIApplicationDelegateAdapter {
         appearanceTableView.setSeparatorColor(HIGHLIGHT_COLOR);
         UISwitch appearanceSwitch = UIAppearance.getAppearance(UISwitch.class);
         appearanceSwitch.setOnTintColor(HIGHLIGHT_COLOR);
-        
-        /* Create the UIWindow which is the root view in our UI. */
-        UIWindow window = new UIWindow(UIScreen.getMainScreen().getBounds());
-        window.makeKeyAndVisible();
-        window.setRootViewController(tabBarController);
-        /*
-         * The Objective-C side won't retain our UIWindow. Prevent it from being
-         * GCed and released by the Java side.
-         */
-        application.addStrongRef(window);
 
         return true;
     }
@@ -195,8 +103,13 @@ public class ContractRApp extends UIApplicationDelegateAdapter {
         UIGraphics.endImageContext();
         return image;
     }
-    
+
     public static void main(String[] args) {
+
+        component = DaggerContractRComponent.builder()
+                .contractRModule(new ContractRModule())
+                .build();
+
         try (NSAutoreleasePool pool = new NSAutoreleasePool()) {
             UIApplication.main(args, null, ContractRApp.class);
         }
