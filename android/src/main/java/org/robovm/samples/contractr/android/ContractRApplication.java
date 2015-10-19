@@ -14,6 +14,11 @@ import roboguice.RoboGuice;
 import java.io.File;
 
 public class ContractRApplication extends Application {
+    /**
+     * Whether dummy data should be preloaded into new databases.
+     */
+    public static final boolean PRELOAD_DATA = true;
+
     public static final int HIGHLIGHT_COLOR = Color.argb(255, 0x93, 0xc6, 0x23);
 
     private ClientModel clientModel;
@@ -35,8 +40,8 @@ public class ContractRApplication extends Application {
 
         SingletonConnectionPool connectionPool = new SingletonConnectionPool(
                 "jdbc:sqldroid:" + dbFile.getAbsolutePath());
-        JdbcClientManager clientManager = new JdbcClientManager(connectionPool);
-        JdbcTaskManager taskManager = new JdbcTaskManager(connectionPool);
+        JdbcClientManager clientManager = new JdbcClientManager(connectionPool, PRELOAD_DATA);
+        JdbcTaskManager taskManager = new JdbcTaskManager(connectionPool, PRELOAD_DATA);
         clientManager.setTaskManager(taskManager);
         taskManager.setClientManager(clientManager);
         clientModel = new ClientModel(clientManager);
@@ -48,8 +53,6 @@ public class ContractRApplication extends Application {
                     protected void configure() {
                         bind(ClientModel.class).toInstance(clientModel);
                         bind(TaskModel.class).toInstance(taskModel);
-
-
                     }
                 }));
 

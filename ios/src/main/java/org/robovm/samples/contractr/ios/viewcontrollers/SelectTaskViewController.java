@@ -16,12 +16,10 @@
 package org.robovm.samples.contractr.ios.viewcontrollers;
 
 import org.robovm.apple.foundation.NSIndexPath;
-import org.robovm.apple.uikit.UITableView;
-import org.robovm.apple.uikit.UITableViewCell;
-import org.robovm.apple.uikit.UITableViewCellAccessoryType;
-import org.robovm.apple.uikit.UITableViewCellStyle;
+import org.robovm.apple.uikit.*;
 import org.robovm.objc.annotation.CustomClass;
 import org.robovm.objc.annotation.IBAction;
+import org.robovm.objc.annotation.IBOutlet;
 import org.robovm.samples.contractr.core.Client;
 import org.robovm.samples.contractr.core.ClientModel;
 import org.robovm.samples.contractr.core.Task;
@@ -34,6 +32,13 @@ import javax.inject.Inject;
  */
 @CustomClass("SelectTaskViewController")
 public class SelectTaskViewController extends InjectedTableViewController {
+
+    @CustomClass("SelectTaskCell")
+    public static class SelectTaskCell extends UITableViewCell {
+        @IBOutlet UILabel titleLabel;
+        @IBOutlet UILabel timeElapsedLabel;
+    }
+
     @Inject ClientModel clientModel;
     @Inject TaskModel taskModel;
 
@@ -61,14 +66,10 @@ public class SelectTaskViewController extends InjectedTableViewController {
 
     @Override
     public UITableViewCell getCellForRow(UITableView tableView, NSIndexPath indexPath) {
-        UITableViewCell cell = tableView.dequeueReusableCell("cell");
-        if (cell == null) {
-            cell = new UITableViewCell(UITableViewCellStyle.Value1, "cell");
-            cell.setAccessoryType(UITableViewCellAccessoryType.DisclosureIndicator);
-        }
+        SelectTaskCell cell = (SelectTaskCell) tableView.dequeueReusableCell("cell");
         Task task = getTaskForRow(indexPath);
-        cell.getTextLabel().setText(task.getTitle());
-        cell.getDetailTextLabel().setText(task.getTimeElapsed());
+        cell.titleLabel.setText(task.getTitle());
+        cell.timeElapsedLabel.setText(task.getTimeElapsed());
         return cell;
     }
 

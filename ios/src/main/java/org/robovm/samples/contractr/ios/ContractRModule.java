@@ -36,6 +36,11 @@ import java.io.File;
 @Module
 public class ContractRModule {
 
+    /**
+     * Whether dummy data should be preloaded into new databases.
+     */
+    public static final boolean PRELOAD_DATA = true;
+
     @Provides
     @Singleton
     public ConnectionPool proivdeConnectionPool() {
@@ -62,13 +67,13 @@ public class ContractRModule {
     @Provides
     @Singleton
     public ClientManager proivdeClientManager(ConnectionPool connectionPool) {
-        return new JdbcClientManager(connectionPool);
+        return new JdbcClientManager(connectionPool, PRELOAD_DATA);
     }
 
     @Provides
     @Singleton
     public TaskManager proivdeTaskManager(ConnectionPool connectionPool, ClientManager clientManager) {
-        JdbcTaskManager taskManager = new JdbcTaskManager(connectionPool);
+        JdbcTaskManager taskManager = new JdbcTaskManager(connectionPool, PRELOAD_DATA);
         taskManager.setClientManager((JdbcClientManager) clientManager);
         ((JdbcClientManager) clientManager).setTaskManager(taskManager);
         return taskManager;

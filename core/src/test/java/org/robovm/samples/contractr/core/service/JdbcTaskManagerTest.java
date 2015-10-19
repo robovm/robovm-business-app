@@ -25,6 +25,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.Date;
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -50,7 +51,7 @@ public class JdbcTaskManagerTest {
     public void setup() throws Exception {
         Class.forName("org.sqlite.JDBC");
         connectionPool = new SingletonConnectionPool("jdbc:sqlite::memory:");
-        clientManager = new JdbcClientManager(connectionPool);
+        clientManager = new JdbcClientManager(connectionPool, false);
         client1 = clientManager.create();
         client1.setName("Google");
         client1.setHourlyRate(BigDecimal.valueOf(10000, 2));
@@ -63,14 +64,14 @@ public class JdbcTaskManagerTest {
 
     @Test
     public void testEmpty() {
-        JdbcTaskManager man = new JdbcTaskManager(connectionPool);
+        JdbcTaskManager man = new JdbcTaskManager(connectionPool, false);
         man.setClientManager(clientManager);
         assertEquals(0, man.count());
     }
 
     @Test
     public void testSaveGetDelete() {
-        JdbcTaskManager man = new JdbcTaskManager(connectionPool);
+        JdbcTaskManager man = new JdbcTaskManager(connectionPool, false);
         man.setClientManager(clientManager);
         assertEquals(0, man.count());
         Task task1 = man.create(client1);
@@ -103,7 +104,7 @@ public class JdbcTaskManagerTest {
 
     @Test
     public void testWorkUnits() throws Exception {
-        JdbcTaskManager man = new JdbcTaskManager(connectionPool);
+        JdbcTaskManager man = new JdbcTaskManager(connectionPool, false);
         man.setClientManager(clientManager);
         assertEquals(0, man.count());
         Task task1 = man.create(client1);
@@ -174,4 +175,31 @@ public class JdbcTaskManagerTest {
             assertFalse(rs.next());
         }
     }
+
+    @Test
+    public void testPreloadTasks() {
+        ConnectionPool connectionPool = new SingletonConnectionPool("jdbc:sqlite::memory:");
+        JdbcClientManager clientManager = new JdbcClientManager(connectionPool, true);
+        JdbcTaskManager taskManager = new JdbcTaskManager(connectionPool, true);
+        clientManager.setTaskManager(taskManager);
+        taskManager.setClientManager(clientManager);
+
+        assertEquals(2, clientManager.count());
+        Client client1 = clientManager.get(0);
+        assertEquals("Hooli", client1.getName());
+        assertEquals(BigDecimal.valueOf(150), client1.getHourlyRate());
+        List<Task> tasks1 = taskManager.getForClient(client1, false);
+        assertEquals(3, tasks1.size());
+        Task task1 = tasks1.get(0);
+        assertEquals("Convert Nucleus to Middle-Out", task1.getTitle());
+
+        Client client2 = clientManager.get(1);
+        assertEquals("Piped Piper", client2.getName());
+        assertEquals(BigDecimal.valueOf(100), client2.getHourlyRate());
+        List<Task> tasks2 = taskManager.getForClient(client2, false);
+        assertEquals(3, tasks2.size());
+        Task task4 = tasks2.get(0);
+        assertEquals("Compress Manifest", task4.getTitle());
+    }
+
 }

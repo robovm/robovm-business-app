@@ -40,12 +40,12 @@ public class JdbcClientManagerTest {
     public void setup() throws Exception {
         Class.forName("org.sqlite.JDBC");
         connectionPool = new SingletonConnectionPool("jdbc:sqlite::memory:");
-        taskManager = new JdbcTaskManager(connectionPool);
+        taskManager = new JdbcTaskManager(connectionPool, false);
     }
 
     @Test
     public void testEmpty() {
-        JdbcClientManager man = new JdbcClientManager(connectionPool);
+        JdbcClientManager man = new JdbcClientManager(connectionPool, false);
         man.setTaskManager(taskManager);
 
         assertEquals(0, man.count());
@@ -53,7 +53,7 @@ public class JdbcClientManagerTest {
 
     @Test
     public void testSaveGetDelete() {
-        JdbcClientManager man = new JdbcClientManager(connectionPool);
+        JdbcClientManager man = new JdbcClientManager(connectionPool, false);
         man.setTaskManager(taskManager);
 
         assertEquals(0, man.count());
@@ -87,8 +87,8 @@ public class JdbcClientManagerTest {
 
     @Test
     public void testDeleteDeletesTasks() {
-        JdbcClientManager clientManager = new JdbcClientManager(connectionPool);
-        JdbcTaskManager taskManager = new JdbcTaskManager(connectionPool);
+        JdbcClientManager clientManager = new JdbcClientManager(connectionPool, false);
+        JdbcTaskManager taskManager = new JdbcTaskManager(connectionPool, false);
         clientManager.setTaskManager(taskManager);
         taskManager.setClientManager(clientManager);
 
@@ -114,5 +114,18 @@ public class JdbcClientManagerTest {
         assertEquals(client2, clientManager.get(0));
         assertEquals(1, taskManager.count());
         assertEquals(task2, taskManager.get(0));
+    }
+
+    @Test
+    public void testPreloadClients() {
+        JdbcClientManager clientManager = new JdbcClientManager(connectionPool, true);
+
+        assertEquals(2, clientManager.count());
+        Client client1 = clientManager.get(0);
+        assertEquals("Hooli", client1.getName());
+        assertEquals(BigDecimal.valueOf(150), client1.getHourlyRate());
+        Client client2 = clientManager.get(1);
+        assertEquals("Piped Piper", client2.getName());
+        assertEquals(BigDecimal.valueOf(100), client2.getHourlyRate());
     }
 }

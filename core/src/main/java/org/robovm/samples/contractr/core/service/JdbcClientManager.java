@@ -15,6 +15,10 @@
  */
 package org.robovm.samples.contractr.core.service;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -61,9 +65,9 @@ public class JdbcClientManager implements ClientManager {
     private final ArrayList<JdbcClientImpl> clients = new ArrayList<>();
     private JdbcTaskManager taskManager;
 
-    public JdbcClientManager(ConnectionPool connectionPool) {
+    public JdbcClientManager(ConnectionPool connectionPool, boolean preloadData) {
         this.connectionPool = Objects.requireNonNull(connectionPool, "connectionPool");
-        createSchemaIfNeeded();
+        createSchemaIfNeeded(preloadData);
     }
 
     public void setTaskManager(JdbcTaskManager taskManager) {
@@ -74,13 +78,39 @@ public class JdbcClientManager implements ClientManager {
         return connectionPool.getConnection();
     }
 
-    private void createSchemaIfNeeded() {
+    private void createSchemaIfNeeded(boolean preloadData) {
         try {
             Connection conn = getConnection();
-            try (Statement stmt = conn.createStatement()) {
-                stmt.executeUpdate(SQL_CREATE_TABLE_CLIENTS);
+            ResultSet tables = conn.getMetaData().getTables(null, null, "clients", null);
+            if (!tables.next()) {
+                try (Statement stmt = conn.createStatement()) {
+                    stmt.executeUpdate(SQL_CREATE_TABLE_CLIENTS);
+                    if (preloadData) {
+                        preload();
+                    }
+                }
             }
         } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void preload() {
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream("clients.csv"), "UTF8"))) {
+            String line = null;
+            while ((line = reader.readLine()) != null) {
+                String[] parts = line.split(";");
+                Connection conn = getConnection();
+                try (PreparedStatement stmt = conn.prepareStatement(SQL_INSERT_CLIENT)) {
+                    stmt.setString(1, parts[1]);
+                    stmt.setString(2, parts[2]);
+                    stmt.setString(3, parts[0]);
+                    stmt.executeUpdate();
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }

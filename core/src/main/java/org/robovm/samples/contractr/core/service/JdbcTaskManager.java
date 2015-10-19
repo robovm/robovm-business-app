@@ -15,6 +15,9 @@
  */
 package org.robovm.samples.contractr.core.service;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -90,9 +93,9 @@ public class JdbcTaskManager implements TaskManager {
     private final ArrayList<JdbcTaskImpl> tasks = new ArrayList<>();
     private JdbcClientManager clientManager;
 
-    public JdbcTaskManager(ConnectionPool connectionPool) {
+    public JdbcTaskManager(ConnectionPool connectionPool, boolean preloadData) {
         this.connectionPool = Objects.requireNonNull(connectionPool, "connectionPool");
-        createSchemaIfNeeded();
+        createSchemaIfNeeded(preloadData);
     }
 
     public void setClientManager(JdbcClientManager clientManager) {
@@ -103,14 +106,44 @@ public class JdbcTaskManager implements TaskManager {
         return connectionPool.getConnection();
     }
 
-    private void createSchemaIfNeeded() {
+    private void createSchemaIfNeeded(boolean preloadData) {
         try {
             Connection conn = getConnection();
-            try (Statement stmt = conn.createStatement()) {
-                stmt.executeUpdate(SQL_CREATE_TABLE_TASKS);
-                stmt.executeUpdate(SQL_CREATE_TABLE_WORK_UNITS);
+            ResultSet tables = conn.getMetaData().getTables(null, null, "tasks", null);
+            if (!tables.next()) {
+                try (Statement stmt = conn.createStatement()) {
+                    stmt.executeUpdate(SQL_CREATE_TABLE_TASKS);
+                    stmt.executeUpdate(SQL_CREATE_TABLE_WORK_UNITS);
+                    if (preloadData) {
+                        preload();
+                    }
+                }
             }
         } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void preload() {
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream("tasks.csv"), "UTF8"))) {
+            String line = null;
+            while ((line = reader.readLine()) != null) {
+                String[] parts = line.split(";");
+                Connection conn = getConnection();
+                try (PreparedStatement stmt = conn.prepareStatement(SQL_INSERT_TASK)) {
+                    stmt.setString(1, parts[0]); // client_id
+                    stmt.setString(2, parts[2]); // title
+                    stmt.setString(3, ""); // notes
+                    stmt.setInt(4, 0); // finished
+                    stmt.setObject(5, null); // work_start_time
+                    stmt.setInt(6, 0); // seconds_worked
+                    stmt.setString(7, parts[1]); // id
+                    stmt.executeUpdate();
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }

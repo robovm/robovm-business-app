@@ -20,21 +20,7 @@ import org.robovm.apple.coregraphics.CGSize;
 import org.robovm.apple.foundation.NSArray;
 import org.robovm.apple.foundation.NSAttributedString;
 import org.robovm.apple.foundation.NSAutoreleasePool;
-import org.robovm.apple.uikit.NSAttributedStringAttributes;
-import org.robovm.apple.uikit.UIAppearance;
-import org.robovm.apple.uikit.UIApplication;
-import org.robovm.apple.uikit.UIApplicationDelegateAdapter;
-import org.robovm.apple.uikit.UIApplicationLaunchOptions;
-import org.robovm.apple.uikit.UIBarStyle;
-import org.robovm.apple.uikit.UIColor;
-import org.robovm.apple.uikit.UIFont;
-import org.robovm.apple.uikit.UIGraphics;
-import org.robovm.apple.uikit.UIImage;
-import org.robovm.apple.uikit.UINavigationBar;
-import org.robovm.apple.uikit.UISwitch;
-import org.robovm.apple.uikit.UITabBar;
-import org.robovm.apple.uikit.UITableView;
-import org.robovm.apple.uikit.UIViewController;
+import org.robovm.apple.uikit.*;
 import org.robovm.samples.contractr.ios.viewcontrollers.RootViewController;
 
 /**
