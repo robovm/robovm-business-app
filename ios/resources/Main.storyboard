@@ -261,14 +261,30 @@
                     <view key="view" contentMode="scaleToFill" id="wbk-Hs-POt">
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="1gw-zM-lhL" customClass="PCPieChart">
+                                <rect key="frame" x="20" y="64" width="560" height="487"/>
+                                <animations/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                            </view>
+                        </subviews>
                         <animations/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstAttribute="trailingMargin" secondItem="1gw-zM-lhL" secondAttribute="trailing" id="4BZ-DE-YAJ"/>
+                            <constraint firstItem="1gw-zM-lhL" firstAttribute="leading" secondItem="wbk-Hs-POt" secondAttribute="leadingMargin" id="ZJz-dL-v2S"/>
+                            <constraint firstItem="Cmr-Kq-6HI" firstAttribute="top" secondItem="1gw-zM-lhL" secondAttribute="bottom" id="fwv-Sk-5xH"/>
+                            <constraint firstItem="1gw-zM-lhL" firstAttribute="top" secondItem="4cI-Ee-qz8" secondAttribute="bottom" id="jji-mA-G5q"/>
+                        </constraints>
                     </view>
-                    <tabBarItem key="tabBarItem" title="Reports" id="9Ge-Dx-qoJ"/>
+                    <navigationItem key="navigationItem" title="Reports" id="uhM-eI-eID"/>
+                    <connections>
+                        <outlet property="pieChart" destination="1gw-zM-lhL" id="eMy-Ij-2x0"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="3m6-me-wmJ" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1068" y="1083"/>
+            <point key="canvasLocation" x="1880" y="1083"/>
         </scene>
         <!--Clients Navigation View Controller-->
         <scene sceneID="PrG-an-hhC">
@@ -640,7 +656,7 @@
                     </tabBar>
                     <connections>
                         <segue destination="0hL-CH-LEO" kind="relationship" relationship="viewControllers" id="QFY-cQ-THI"/>
-                        <segue destination="SY2-F8-MRd" kind="relationship" relationship="viewControllers" id="P1S-xt-Hdw"/>
+                        <segue destination="mbu-w5-eJC" kind="relationship" relationship="viewControllers" id="P1S-xt-Hdw"/>
                         <segue destination="ROq-bi-i49" kind="relationship" relationship="viewControllers" id="1tA-fl-vqe"/>
                         <segue destination="PvN-HR-ZsQ" kind="relationship" relationship="viewControllers" id="KTo-7G-ZIl"/>
                     </connections>
@@ -884,6 +900,26 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="geu-7n-dT7" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="1068" y="392"/>
+        </scene>
+        <!--Reports-->
+        <scene sceneID="xPE-Fx-Pqt">
+            <objects>
+                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="mbu-w5-eJC" sceneMemberID="viewController">
+                    <tabBarItem key="tabBarItem" title="Reports" id="9Ge-Dx-qoJ"/>
+                    <toolbarItems/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="TrI-Gr-ITl">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <animations/>
+                    </navigationBar>
+                    <nil name="viewControllers"/>
+                    <connections>
+                        <segue destination="SY2-F8-MRd" kind="relationship" relationship="rootViewController" id="Ig9-Cr-FBM"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="PYS-al-gzz" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1068" y="1083"/>
         </scene>
     </scenes>
 </document>
