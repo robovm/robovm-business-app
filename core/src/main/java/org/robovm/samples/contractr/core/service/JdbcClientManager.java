@@ -61,7 +61,7 @@ public class JdbcClientManager implements ClientManager {
     // @formatter:on
 
     private final ConnectionPool connectionPool;
-    private boolean dirty = true;
+    boolean dirty = true;
     private final ArrayList<JdbcClientImpl> clients = new ArrayList<>();
     private JdbcTaskManager taskManager;
 
@@ -191,6 +191,9 @@ public class JdbcClientManager implements ClientManager {
             throw new RuntimeException(e);
         } finally {
             dirty = true;
+            if (taskManager != null) {
+                taskManager.dirty = true;
+            }
         }
     }
 

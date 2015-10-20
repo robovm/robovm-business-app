@@ -89,7 +89,7 @@ public class JdbcTaskManager implements TaskManager {
     // @formatter:on
 
     private final ConnectionPool connectionPool;
-    private boolean dirty = true;
+    boolean dirty = true;
     private final ArrayList<JdbcTaskImpl> tasks = new ArrayList<>();
     private JdbcClientManager clientManager;
 

@@ -57,6 +57,13 @@ public class ClientModel {
     }
 
     /**
+     * Unsubscribes a listener previously subscribed using {@link #subscribe(Object)}.
+     */
+    public void unsubscribe(Object listener) {
+        bus.unsubscribe(listener);
+    }
+
+    /**
      * Returns the currently selected {@link Client} or {@code null} if no
      * {@link Client} has been selected.
      */

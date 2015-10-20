@@ -65,6 +65,13 @@ public class TaskModel {
     }
 
     /**
+     * Unsubscribes a listener previously subscribed using {@link #subscribe(Object)}.
+     */
+    public void unsubscribe(Object listener) {
+        bus.unsubscribe(listener);
+    }
+
+    /**
      * Returns the currently selected {@link Task} or {@code null} if no
      * {@link Task} has been selected.
      */

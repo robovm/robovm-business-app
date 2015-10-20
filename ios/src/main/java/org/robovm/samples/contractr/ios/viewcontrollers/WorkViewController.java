@@ -18,10 +18,7 @@ package org.robovm.samples.contractr.ios.viewcontrollers;
 import net.engio.mbassy.listener.Handler;
 import org.robovm.apple.coreanimation.CALayer;
 import org.robovm.apple.dispatch.DispatchQueue;
-import org.robovm.apple.uikit.UIButton;
-import org.robovm.apple.uikit.UIColor;
-import org.robovm.apple.uikit.UIControlState;
-import org.robovm.apple.uikit.UILabel;
+import org.robovm.apple.uikit.*;
 import org.robovm.objc.annotation.CustomClass;
 import org.robovm.objc.annotation.IBAction;
 import org.robovm.objc.annotation.IBOutlet;
@@ -31,6 +28,7 @@ import org.robovm.samples.contractr.core.TaskModel;
 import org.robovm.samples.contractr.core.TaskModel.WorkStartedEvent;
 import org.robovm.samples.contractr.core.TaskModel.WorkStoppedEvent;
 import org.robovm.samples.contractr.ios.ContractRApp;
+import org.robovm.samples.contractr.ios.IOSColors;
 
 import javax.inject.Inject;
 import java.text.NumberFormat;
@@ -40,22 +38,16 @@ import java.util.concurrent.TimeUnit;
 @CustomClass("WorkViewController")
 public class WorkViewController extends InjectedViewController {
 
-    private static final UIColor START_COLOR = ContractRApp.HIGHLIGHT_COLOR;
-    private static final UIColor STOP_COLOR =
-            UIColor.fromRGBA(1.0, 0, 0, 1.0);
-
     @Inject ClientModel clientModel;
     @Inject TaskModel taskModel;
 
     @IBOutlet UIButton startStopButton;
+    @IBOutlet UILabel currentClientLabel;
+    @IBOutlet UIView currentClientColorView;
     @IBOutlet UILabel currentTaskLabel;
     @IBOutlet UILabel earnedLabel;
     @IBOutlet UILabel timerLabel;
     private boolean showing = true;
-
-    public WorkViewController() {
-        taskModel.subscribe(this);
-    }
 
     @Handler
     public void workStarted(WorkStartedEvent event) {
@@ -73,6 +65,7 @@ public class WorkViewController extends InjectedViewController {
     @Override
     public void viewWillAppear(boolean animated) {
         super.viewWillAppear(animated);
+        taskModel.subscribe(this);
         showing = true;
         updateUIComponents();
         tick();
@@ -80,6 +73,7 @@ public class WorkViewController extends InjectedViewController {
 
     @Override
     public void viewWillDisappear(boolean animated) {
+        taskModel.unsubscribe(this);
         showing = false;
         super.viewWillDisappear(animated);
     }
@@ -99,19 +93,23 @@ public class WorkViewController extends InjectedViewController {
         String startStopTitle = null;
         String currentTaskText = null;
         if (task == null) {
-            startStopTitle = "Start Work";
-            startStopColor = START_COLOR;
+            startStopTitle = "Start work";
+            startStopColor = IOSColors.START_WORK;
             currentTaskText = "None";
+            currentClientLabel.setHidden(true);
+            currentClientColorView.setHidden(true);
         } else {
-            startStopTitle = "Stop Work";
-            startStopColor = STOP_COLOR;
-            currentTaskText = task.getClient().getName() + " - " + task.getTitle();
+            startStopTitle = "Stop work";
+            startStopColor = IOSColors.STOP_WORK;
+            currentTaskText = task.getTitle();
+            currentClientLabel.setText(task.getClient().getName());
+            currentClientLabel.setHidden(false);
+            currentClientColorView.setBackgroundColor(
+                    IOSColors.getClientColor(clientModel.indexOf(task.getClient())));
+            currentClientColorView.setHidden(false);
         }
         startStopButton.setTitle(startStopTitle, UIControlState.Normal);
-        startStopButton.setTitleColor(startStopColor, UIControlState.Normal);
-        CALayer layer = startStopButton.getLayer();
-        layer.setBorderWidth(1.0);
-        layer.setBorderColor(startStopColor.getCGColor());
+        startStopButton.setBackgroundColor(startStopColor);
         currentTaskLabel.setText(currentTaskText);
     }
 

@@ -28,9 +28,6 @@ import org.robovm.samples.contractr.ios.viewcontrollers.RootViewController;
  */
 public class ContractRApp extends UIApplicationDelegateAdapter {
 
-    public static final UIColor HIGHLIGHT_COLOR = 
-            UIColor.fromRGBA(0x93 / 255.0, 0xc6 / 255.0, 0x23 / 255.0, 1.0);
-
     private static ContractRComponent component;
 
     public static ContractRComponent getComponent() {
@@ -56,15 +53,13 @@ public class ContractRApp extends UIApplicationDelegateAdapter {
 
         /* Customize the colors in the UI. */
         UITabBar appearanceTabBar = UIAppearance.getAppearance(UITabBar.class);
-        appearanceTabBar.setTintColor(HIGHLIGHT_COLOR);
+        appearanceTabBar.setTintColor(IOSColors.MAIN);
         UINavigationBar appearanceNavigationBar = UIAppearance.getAppearance(UINavigationBar.class);
         appearanceNavigationBar.setBarStyle(UIBarStyle.Black);
-        appearanceNavigationBar.setBarTintColor(HIGHLIGHT_COLOR);
+        appearanceNavigationBar.setBarTintColor(IOSColors.MAIN);
         appearanceNavigationBar.setTintColor(UIColor.white());
-        UITableView appearanceTableView = UIAppearance.getAppearance(UITableView.class);
-        appearanceTableView.setSeparatorColor(HIGHLIGHT_COLOR);
         UISwitch appearanceSwitch = UIAppearance.getAppearance(UISwitch.class);
-        appearanceSwitch.setOnTintColor(HIGHLIGHT_COLOR);
+        appearanceSwitch.setOnTintColor(IOSColors.MAIN);
 
         return true;
     }
