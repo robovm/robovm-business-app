@@ -60,6 +60,8 @@ public class ContractRApp extends UIApplicationDelegateAdapter {
         appearanceNavigationBar.setTintColor(UIColor.white());
         UISwitch appearanceSwitch = UIAppearance.getAppearance(UISwitch.class);
         appearanceSwitch.setOnTintColor(IOSColors.MAIN);
+        UISegmentedControl appearanceSegmentedControl = UIAppearance.getAppearance(UISegmentedControl.class);
+        appearanceSegmentedControl.setTintColor(IOSColors.MAIN);
 
         return true;
     }

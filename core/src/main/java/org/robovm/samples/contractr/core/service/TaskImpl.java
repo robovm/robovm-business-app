@@ -15,18 +15,13 @@
  */
 package org.robovm.samples.contractr.core.service;
 
-import java.math.BigDecimal;
-import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
-import java.util.Objects;
-
 import org.robovm.samples.contractr.core.Client;
 import org.robovm.samples.contractr.core.Task;
 import org.robovm.samples.contractr.core.WorkUnit;
+
+import java.math.BigDecimal;
+import java.text.NumberFormat;
+import java.util.*;
 
 /**
  * Default implementation of {@link Task}.

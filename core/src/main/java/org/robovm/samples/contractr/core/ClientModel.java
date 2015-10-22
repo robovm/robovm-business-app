@@ -15,14 +15,17 @@
  */
 package org.robovm.samples.contractr.core;
 
-import java.util.Objects;
-
 import net.engio.mbassy.bus.MBassador;
 import net.engio.mbassy.bus.config.BusConfiguration;
 import net.engio.mbassy.bus.config.Feature;
 import net.engio.mbassy.listener.Handler;
-
 import org.robovm.samples.contractr.core.service.ClientManager;
+import org.robovm.samples.contractr.core.service.TaskManager;
+
+import java.math.BigDecimal;
+import java.text.NumberFormat;
+import java.util.Locale;
+import java.util.Objects;
 
 /**
  * Model for {@link Client} objects. Supports the use cases the controllers in
@@ -31,6 +34,7 @@ import org.robovm.samples.contractr.core.service.ClientManager;
  */
 public class ClientModel {
     private final ClientManager clientManager;
+    private final TaskManager taskManager;
     private final MBassador<Object> bus;
 
     private Client selectedClient;
@@ -39,8 +43,9 @@ public class ClientModel {
      * Creates a new {@link ClientModel} backed by the specified
      * {@link ClientManager}.
      */
-    public ClientModel(ClientManager clientManager) {
+    public ClientModel(ClientManager clientManager, TaskManager taskManager) {
         this.clientManager = Objects.requireNonNull(clientManager, "clientManager");
+        this.taskManager = Objects.requireNonNull(taskManager, "taskManager");
         this.bus = new MBassador<Object>(new BusConfiguration()
                 .addFeature(Feature.SyncPubSub.Default())
                 .addFeature(Feature.AsynchronousHandlerInvocation.Default())
@@ -135,6 +140,43 @@ public class ClientModel {
             }
             bus.publish(new ClientDeletedEvent(client));
         }
+    }
+
+    /**
+     * Returns the total number of seconds worked for the specified {@link Client}.
+     */
+    public int getTotalSecondsElapsed(Client client) {
+        int seconds = 0;
+        for (Task task : taskManager.getForClient(client, false)) {
+            seconds += task.getSecondsElapsed();
+        }
+        return seconds;
+    }
+
+    /**
+     * Returns a textual representation of the total time elapsed for this
+     * {@link Client} suitable for display in a UI.
+     */
+    public String getTotalTimeElapsed(Client client) {
+        int seconds = getTotalSecondsElapsed(client);
+        int minutes = seconds / 60;
+        int hours = minutes / 60;
+        return String.format("%02d:%02d:%02d", hours, minutes % 60, seconds % 60);
+    }
+
+    /**
+     * Returns the total amount earned on work done for the specified {@link Client}.
+     */
+    public BigDecimal getTotalAmountEarned(Client client) {
+        return client.getHourlyRate().multiply(BigDecimal.valueOf(getTotalSecondsElapsed(client) / 3600.0));
+    }
+
+    /**
+     * Returns the total amount earned on work done for the specified {@link Client} as a string formatted using the
+     * specified {@link Locale}.
+     */
+    public String getTotalAmountEarned(Client client, Locale locale) {
+        return NumberFormat.getCurrencyInstance(locale).format(getTotalAmountEarned(client));
     }
 
     /**

@@ -15,43 +15,114 @@
  */
 package org.robovm.samples.contractr.ios.viewcontrollers;
 
-import org.robovm.apple.foundation.NSMutableArray;
-import org.robovm.apple.uikit.UIColor;
-import org.robovm.apple.uikit.UIView;
-import org.robovm.apple.uikit.UIViewController;
+import org.robovm.apple.dispatch.DispatchQueue;
+import org.robovm.apple.foundation.NSIndexPath;
+import org.robovm.apple.uikit.*;
 import org.robovm.objc.annotation.CustomClass;
+import org.robovm.objc.annotation.IBAction;
 import org.robovm.objc.annotation.IBOutlet;
+import org.robovm.samples.contractr.core.Client;
+import org.robovm.samples.contractr.core.ClientModel;
 import org.robovm.samples.contractr.ios.IOSColors;
-import org.robovm.samples.contractr.ios.NSLayoutConstraintUtil;
-import org.robovm.samples.contractr.ios.iosplot.PCPieChart;
-import org.robovm.samples.contractr.ios.iosplot.PCPieComponent;
+import org.robovm.samples.contractr.ios.views.PieChartView;
+import org.robovm.samples.contractr.ios.views.PieChartView.Component;
+
+import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 @CustomClass("ReportsViewController")
-public class ReportsViewController extends UIViewController {
+public class ReportsViewController extends InjectedViewController {
+    @Inject ClientModel clientModel;
+    @IBOutlet PieChartView pieChart;
+    @IBOutlet UITableView clientsTableView;
+    @IBOutlet UISegmentedControl typeSegmentedControl;
+    private boolean showing = true;
 
-    @IBOutlet PCPieChart pieChart;
+    @CustomClass("ReportsClientCell")
+    public static class ReportsClientCell extends UITableViewCell {
+        @IBOutlet UIView colorView;
+        @IBOutlet UILabel nameLabel;
+        @IBOutlet UILabel valueLabel;
+    }
 
     @Override
     public void viewDidLoad() {
         super.viewDidLoad();
-        
-        pieChart.setDiameter(200);
-        NSMutableArray<PCPieComponent> components = new NSMutableArray<PCPieComponent>(
-                new PCPieComponent("Apple", 100, IOSColors.getClientColor(0)),
-                new PCPieComponent("Google", 200, IOSColors.getClientColor(1)),
-                new PCPieComponent("Oracle", 200, IOSColors.getClientColor(2))
-                );
-        pieChart.setComponents(components);
-//        pieChart.setTranslatesAutoresizingMaskIntoConstraints(false);
-//
-//        UIView rootView = getView();
-//        rootView.setBackgroundColor(UIColor.white());
-//        rootView.addSubview(pieChart);
-//
-//        rootView.addConstraint(NSLayoutConstraintUtil.centerHorizontally(pieChart, rootView, 1.0, 0));
-//        rootView.addConstraint(NSLayoutConstraintUtil.centerVertically(pieChart, rootView, 1.0, 0));
-//        rootView.addConstraint(NSLayoutConstraintUtil.equalWidth(pieChart, rootView, 1.0, 0));
-//        rootView.addConstraint(NSLayoutConstraintUtil.equalHeight(pieChart, rootView, 1.0, 0));
+
+        clientsTableView.setDataSource(new UITableViewDataSourceAdapter() {
+            @Override
+            public UITableViewCell getCellForRow(UITableView tableView, NSIndexPath indexPath) {
+                boolean showAmount = typeSegmentedControl.getSelectedSegment() == 0;
+                ReportsClientCell cell = (ReportsClientCell) tableView.dequeueReusableCell("cell");
+                Client client = clientModel.get(indexPath.getRow());
+                cell.colorView.setBackgroundColor(IOSColors.getClientColor(clientModel.indexOf(client)));
+                cell.nameLabel.setText(client.getName());
+                if (showAmount) {
+                    cell.valueLabel.setText(clientModel.getTotalAmountEarned(client, Locale.US));
+                } else {
+                    cell.valueLabel.setText(clientModel.getTotalTimeElapsed(client));
+                }
+                return cell;
+            }
+
+            @Override
+            public long getNumberOfSections(UITableView tableView) {
+                return 1;
+            }
+
+            @Override
+            public long getNumberOfRowsInSection(UITableView tableView, long section) {
+                return clientModel.count();
+            }
+        });
     }
-    
+
+    @Override
+    public void viewWillAppear(boolean b) {
+        super.viewWillAppear(b);
+
+        showing = true;
+        loop();
+    }
+
+    @Override
+    public void viewWillDisappear(boolean b) {
+        showing = false;
+        super.viewWillDisappear(b);
+    }
+
+    @IBAction public void chartTypeChanged() {
+        updatePieChart();
+        clientsTableView.reloadData();
+    }
+
+    private void loop() {
+        if (showing) {
+            updatePieChart();
+            clientsTableView.reloadData();
+            DispatchQueue.getMainQueue().after(1, TimeUnit.SECONDS, this::loop);
+        }
+    }
+
+    private void updatePieChart() {
+        boolean showAmount = typeSegmentedControl.getSelectedSegment() == 0;
+
+        List<Component> components = new ArrayList<>();
+        for (int i = 0; i < clientModel.count(); i++) {
+            Client client = clientModel.get(i);
+            UIColor color = IOSColors.getClientColor(i);
+            if (showAmount) {
+                components.add(new Component(color,
+                        clientModel.getTotalAmountEarned(client).doubleValue()));
+            } else {
+                components.add(new Component(color,
+                        clientModel.getTotalSecondsElapsed(client)));
+            }
+        }
+        pieChart.setComponents(components);
+    }
+
 }

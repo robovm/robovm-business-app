@@ -35,6 +35,7 @@ import org.robovm.samples.contractr.core.ClientModel.ClientSavedEvent;
 import org.robovm.samples.contractr.core.ClientModel.SelectedClientChangedEvent;
 import org.robovm.samples.contractr.core.service.TestClient;
 import org.robovm.samples.contractr.core.service.TestClientManager;
+import org.robovm.samples.contractr.core.service.TestTaskManager;
 
 /**
  * Tests {@link ClientModel}.
@@ -69,7 +70,7 @@ public class ClientModelTest {
         clientManager = new TestClientManager();
         clientManager.clients.add(client1);
         clientManager.clients.add(client2);
-        model = new ClientModel(clientManager);
+        model = new ClientModel(clientManager, new TestTaskManager());
         model.subscribe(this);
         events = new ArrayList<>();
     }

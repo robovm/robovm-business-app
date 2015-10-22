@@ -16,11 +16,7 @@
 package org.robovm.samples.contractr.ios;
 
 import dagger.Component;
-import org.robovm.samples.contractr.ios.viewcontrollers.ClientsViewController;
-import org.robovm.samples.contractr.ios.viewcontrollers.EditClientViewController;
-import org.robovm.samples.contractr.ios.viewcontrollers.EditTaskViewController;
-import org.robovm.samples.contractr.ios.viewcontrollers.SelectTaskViewController;
-import org.robovm.samples.contractr.ios.viewcontrollers.WorkViewController;
+import org.robovm.samples.contractr.ios.viewcontrollers.*;
 
 import javax.inject.Singleton;
 import java.lang.reflect.Method;
@@ -34,8 +30,9 @@ public interface ContractRComponent {
     void inject(ClientsViewController controller);
     void inject(EditClientViewController controller);
     void inject(EditTaskViewController controller);
+    void inject(ReportsViewController controller);
     void inject(SelectTaskViewController controller);
-    void inject(org.robovm.samples.contractr.ios.viewcontrollers.TasksViewController controller);
+    void inject(TasksViewController controller);
     void inject(WorkViewController controller);
 
     default void inject(Object o) {

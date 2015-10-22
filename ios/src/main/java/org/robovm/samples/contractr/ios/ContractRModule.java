@@ -81,8 +81,8 @@ public class ContractRModule {
 
     @Provides
     @Singleton
-    public ClientModel proivdeClientModel(ClientManager clientManager) {
-        return new ClientModel(clientManager);
+    public ClientModel proivdeClientModel(ClientManager clientManager, TaskManager taskManager) {
+        return new ClientModel(clientManager, taskManager);
     }
 
     @Provides

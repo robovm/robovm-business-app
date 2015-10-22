@@ -44,7 +44,7 @@ public class ContractRApplication extends Application {
         JdbcTaskManager taskManager = new JdbcTaskManager(connectionPool, PRELOAD_DATA);
         clientManager.setTaskManager(taskManager);
         taskManager.setClientManager(clientManager);
-        clientModel = new ClientModel(clientManager);
+        clientModel = new ClientModel(clientManager, taskManager);
         taskModel = new TaskModel(clientModel, taskManager);
 
         RoboGuice.setBaseApplicationInjector(this, RoboGuice.DEFAULT_STAGE,

@@ -81,7 +81,7 @@ public class TaskModelTest {
         taskManager = new TestTaskManager();
         taskManager.tasks.add(task1);
         taskManager.tasks.add(task2);
-        model = new TaskModel(new ClientModel(new TestClientManager()), taskManager);
+        model = new TaskModel(new ClientModel(new TestClientManager(), taskManager), taskManager);
         model.subscribe(this);
         events = new ArrayList<>();
     }
