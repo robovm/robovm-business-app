@@ -1,20 +1,16 @@
 package org.robovm.samples.contractr.android.fragment;
 
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
-
 import com.google.inject.Inject;
-
 import org.robovm.samples.contractr.android.R;
 import roboguice.fragment.RoboFragment;
 import roboguice.inject.InjectView;
@@ -26,20 +22,17 @@ public abstract class ListFragment extends RoboFragment
     protected LayoutInflater inflater;
     @InjectView(android.R.id.list)
     protected AbsListView listView;
+    @InjectView(R.id.add)
+    protected FloatingActionButton addButton;
 
     public ListFragment() {}
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        setHasOptionsMenu(true);
-        super.onCreate(savedInstanceState);
-    }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         listView.setOnItemClickListener(this);
         listView.setOnItemLongClickListener(this);
+        addButton.setOnClickListener((v) -> onAdd());
     }
 
     protected abstract void onEdit(int row);
@@ -47,15 +40,6 @@ public abstract class ListFragment extends RoboFragment
     protected abstract void onAdd();
 
     protected abstract void onDelete(int row);
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.action_add) {
-            onAdd();
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
 
     protected void openDialog(DialogFragment fragment) {
         FragmentManager fragmentManager = getFragmentManager();
@@ -67,11 +51,6 @@ public abstract class ListFragment extends RoboFragment
         }
         ft.addToBackStack(null);
         fragment.show(ft, "dialog");
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.work, menu);
     }
 
     @Override

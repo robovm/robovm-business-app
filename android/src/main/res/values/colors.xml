@@ -7,6 +7,8 @@
     <color name="windowBackground">#FFFFFF</color>
     <color name="navigationBarColor">#000000</color>
 
+    <color name="btnAdd">#93c623</color>
+
     <color name="btnShadow">#111111</color>
     <color name="btnToggleOn">#93c623</color>
     <color name="btnToggleOnPressed">#ffcaff1e</color>
