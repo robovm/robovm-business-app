@@ -5,7 +5,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
-
+import org.robovm.samples.contractr.android.R;
 import org.robovm.samples.contractr.core.Client;
 import org.robovm.samples.contractr.core.ClientModel;
 import org.robovm.samples.contractr.core.Task;
@@ -14,19 +14,18 @@ import org.robovm.samples.contractr.core.TaskModel;
 import java.util.List;
 
 public class TaskListAdapter extends BaseAdapter {
-
     private TaskModel taskModel;
     private ClientModel clientModel;
     private LayoutInflater inflater;
     private boolean unfinishedOnly;
 
-    public TaskListAdapter(TaskModel taskModel, ClientModel clientModel, LayoutInflater inflater, boolean unfinishedOnly) {
+    public TaskListAdapter(TaskModel taskModel, ClientModel clientModel, LayoutInflater inflater,
+            boolean unfinishedOnly) {
         this.taskModel = taskModel;
         this.clientModel = clientModel;
         this.inflater = inflater;
         this.unfinishedOnly = unfinishedOnly;
     }
-
 
     @Override
     public int getCount() {
@@ -46,12 +45,12 @@ public class TaskListAdapter extends BaseAdapter {
     public View getTaskView(Task t, View convertView, ViewGroup parent) {
         View view = convertView;
         if (convertView == null || !convertView.getTag().equals("task")) {
-            view = inflater.inflate(org.robovm.samples.contractr.android.R.layout.task_row, parent, false);
+            view = inflater.inflate(R.layout.task_row, parent, false);
             view.setTag("task");
         }
 
-        TextView text = (TextView) view.findViewById(org.robovm.samples.contractr.android.R.id.taskTitle);
-        TextView timeWorked = (TextView) view.findViewById(org.robovm.samples.contractr.android.R.id.timeElapased);
+        TextView text = (TextView) view.findViewById(R.id.taskTitle);
+        TextView timeWorked = (TextView) view.findViewById(R.id.timeElapsed);
         text.setText(t.getTitle());
         timeWorked.setText(t.getTimeElapsed());
 
@@ -61,10 +60,10 @@ public class TaskListAdapter extends BaseAdapter {
     public View getClientSeparatorView(Client c, View convertView, ViewGroup parent) {
         View view = convertView;
         if (convertView == null || !convertView.getTag().equals("client")) {
-            view = inflater.inflate(org.robovm.samples.contractr.android.R.layout.client_separator_row, parent, false);
+            view = inflater.inflate(R.layout.client_separator_row, parent, false);
             view.setTag("client");
         }
-        TextView clientName = (TextView) view.findViewById(org.robovm.samples.contractr.android.R.id.clientName);
+        TextView clientName = (TextView) view.findViewById(R.id.clientName);
         clientName.setText(c.getName());
         return view;
     }
@@ -78,8 +77,7 @@ public class TaskListAdapter extends BaseAdapter {
                 if (position - rowNr == 0) {
                     return c;
                 }
-                Task t = tasks.get(position - rowNr - 1);
-                return t;
+                return tasks.get(position - rowNr - 1);
             }
             rowNr += tasks.size() + 1;
         }
@@ -89,7 +87,7 @@ public class TaskListAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         Object row = getItem(position);
-        if (row instanceof  Client) {
+        if (row instanceof Client) {
             return getClientSeparatorView((Client) row, convertView, parent);
         } else if (row instanceof Task) {
             return getTaskView((Task) row, convertView, parent);

@@ -10,7 +10,6 @@ import org.robovm.samples.contractr.core.Client;
 import org.robovm.samples.contractr.core.ClientModel;
 
 public class ClientListAdapter extends BaseAdapter {
-
     ClientModel clientModel;
     LayoutInflater inflater;
 

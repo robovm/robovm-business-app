@@ -1,15 +1,12 @@
-package org.robovm.samples.contractr.android;
-
+package org.robovm.samples.contractr.android.fragment;
 
 public class EditTaskFragment extends AbstractTaskFragment {
 
     public static EditTaskFragment newInstance() {
-        EditTaskFragment fragment = new EditTaskFragment();
-        return fragment;
+        return new EditTaskFragment();
     }
 
-    public EditTaskFragment() {
-    }
+    public EditTaskFragment() {}
 
     @Override
     protected String getTitle() {

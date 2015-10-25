@@ -1,4 +1,4 @@
-package org.robovm.samples.contractr.android;
+package org.robovm.samples.contractr.android.fragment;
 
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
@@ -15,13 +15,17 @@ import android.widget.AdapterView;
 
 import com.google.inject.Inject;
 
+import org.robovm.samples.contractr.android.R;
 import roboguice.fragment.RoboFragment;
 import roboguice.inject.InjectView;
 
-public abstract class ListFragment extends RoboFragment implements AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener {
+public abstract class ListFragment extends RoboFragment
+        implements AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener {
 
-    @Inject protected LayoutInflater inflater;
-    @InjectView(android.R.id.list) protected AbsListView mListView;
+    @Inject
+    protected LayoutInflater inflater;
+    @InjectView(android.R.id.list)
+    protected AbsListView listView;
 
     public ListFragment() {}
 
@@ -34,8 +38,8 @@ public abstract class ListFragment extends RoboFragment implements AdapterView.O
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        mListView.setOnItemClickListener(this);
-        mListView.setOnItemLongClickListener(this);
+        listView.setOnItemClickListener(this);
+        listView.setOnItemLongClickListener(this);
     }
 
     protected abstract void onEdit(int row);
@@ -80,5 +84,4 @@ public abstract class ListFragment extends RoboFragment implements AdapterView.O
         onDelete(position);
         return true;
     }
-
 }

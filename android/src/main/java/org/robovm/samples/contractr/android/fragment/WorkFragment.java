@@ -1,52 +1,48 @@
-package org.robovm.samples.contractr.android;
+package org.robovm.samples.contractr.android.fragment;
 
 import android.app.AlertDialog;
-import android.content.DialogInterface;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
+import android.view.*;
 import android.widget.TextView;
-
+import android.widget.ToggleButton;
 import com.google.inject.Inject;
+import org.robovm.samples.contractr.android.R;
 import org.robovm.samples.contractr.android.adapter.TaskListAdapter;
-
 import org.robovm.samples.contractr.core.ClientModel;
 import org.robovm.samples.contractr.core.Task;
 import org.robovm.samples.contractr.core.TaskModel;
+import roboguice.fragment.RoboFragment;
+import roboguice.inject.InjectView;
 
 import java.text.NumberFormat;
 import java.util.Locale;
 
-import roboguice.fragment.RoboFragment;
-import roboguice.inject.InjectView;
-
 public class WorkFragment extends RoboFragment implements View.OnClickListener {
-
-    private static final int START_COLOR = ContractRApplication.HIGHLIGHT_COLOR;
-    private static final int STOP_COLOR = Color.argb(255, 255, 0, 0);
-
-    @Inject private LayoutInflater inflater;
+    @Inject
+    private LayoutInflater inflater;
     private Task task;
 
-    @InjectView(R.id.startStopButton) Button startStopButton;
-    @InjectView(R.id.currentTaskLabel) TextView currentTaskLabel;
-    @InjectView(R.id.timerLabel) TextView timerLabel;
-    @InjectView(R.id.amountEarned) TextView amountEarned;
+    @InjectView(R.id.startStopButton)
+    ToggleButton startStopButton;
+    @InjectView(R.id.currentTaskLabel)
+    TextView currentTaskLabel;
+    @InjectView(R.id.timerLabel)
+    TextView timerLabel;
+    @InjectView(R.id.amountEarned)
+    TextView amountEarned;
 
     private boolean showing = false;
-    @Inject private TaskModel taskModel;
-    @Inject private ClientModel clientModel;
+    @Inject
+    private TaskModel taskModel;
+    @Inject
+    private ClientModel clientModel;
 
     public static WorkFragment newInstance() {
         WorkFragment fragment = new WorkFragment();
         return fragment;
     }
+
     public WorkFragment() {
         // Required empty public constructor
     }
@@ -86,15 +82,13 @@ public class WorkFragment extends RoboFragment implements View.OnClickListener {
     public void onClick(View v) {
         Task workingTask = taskModel.getWorkingTask();
         if (workingTask == null) {
-           final TaskListAdapter adapter = new TaskListAdapter(taskModel, clientModel, inflater, true);
-           new AlertDialog.Builder(getActivity())
-                    .setTitle("Select task")
-                    .setAdapter(adapter, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            task = (Task) adapter.getItem(which);
-                            start(task);
-                        }
+            final TaskListAdapter adapter = new TaskListAdapter(taskModel, clientModel, inflater, true);
+            new AlertDialog.Builder(getActivity())
+                    .setTitle("Select task:")
+                    .setOnCancelListener(dialog -> updateUIComponents())
+                    .setAdapter(adapter, (dialog, which) -> {
+                        task = (Task) adapter.getItem(which);
+                        start(task);
                     }).create().show();
         } else {
             stop();
@@ -103,23 +97,14 @@ public class WorkFragment extends RoboFragment implements View.OnClickListener {
 
     private void updateUIComponents() {
         Task task = taskModel.getWorkingTask();
-        int startStopColor;
-        String startStopTitle = null;
-        String currentTaskText = null;
+        String currentTaskText;
         if (task == null) {
-            startStopTitle = "Start Work";
-            startStopColor = START_COLOR;
             currentTaskText = "None";
-            startStopButton.setBackground(getResources().getDrawable(R.drawable.start_button));
+            startStopButton.setChecked(true);
         } else {
-            startStopTitle = "Stop Work";
-            startStopColor = STOP_COLOR;
             currentTaskText = task.getClient().getName() + " - " + task.getTitle();
-            startStopButton.setBackground(getResources().getDrawable(R.drawable.stop_button));
+            startStopButton.setChecked(false);
         }
-
-        startStopButton.setText(startStopTitle);
-        startStopButton.setTextColor(startStopColor);
         currentTaskLabel.setText(currentTaskText);
 
     }
@@ -145,14 +130,7 @@ public class WorkFragment extends RoboFragment implements View.OnClickListener {
             timerLabel.setText(task.getTimeElapsed());
             amountEarned.setText(task.getAmountEarned(Locale.US));
             final Handler handler = new Handler();
-            Runnable update = new Runnable() {
-                @Override
-                public void run() {
-                    tick();
-                }
-            };
-
-            handler.postDelayed(update, 1000);
+            handler.postDelayed(this::tick, 1000);
         } else {
             timerLabel.setText("00:00:00");
             amountEarned.setText(NumberFormat.getCurrencyInstance(Locale.US).format(0));

@@ -1,4 +1,4 @@
-package org.robovm.samples.contractr.android;
+package org.robovm.samples.contractr.android.fragment;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -6,36 +6,35 @@ import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.Spinner;
-import android.widget.SpinnerAdapter;
-import android.widget.ToggleButton;
-
+import android.widget.*;
 import com.google.inject.Inject;
+import org.robovm.samples.contractr.android.R;
 import org.robovm.samples.contractr.android.adapter.ClientListAdapter;
-
 import org.robovm.samples.contractr.core.Client;
 import org.robovm.samples.contractr.core.ClientModel;
 import org.robovm.samples.contractr.core.Task;
 import org.robovm.samples.contractr.core.TaskModel;
+import roboguice.fragment.RoboDialogFragment;
+import roboguice.inject.InjectView;
 
 import java.text.NumberFormat;
 import java.util.Locale;
 
-import roboguice.fragment.RoboDialogFragment;
-import roboguice.inject.InjectView;
-
 public abstract class AbstractTaskFragment extends RoboDialogFragment implements AdapterView.OnItemSelectedListener {
-
-    @Inject LayoutInflater inflater;
-    @InjectView(R.id.clientPicker) protected Spinner clientPicker;
-    @InjectView(R.id.title) protected EditText titleTextField;
-    @InjectView(R.id.notes) protected EditText notesTextField;
-    @InjectView(R.id.finished) protected ToggleButton finishedToggle;
-    @InjectView(R.id.action_ok) Button okButton;
-    @InjectView(R.id.action_cancel) Button cancelButton;
+    @Inject
+    LayoutInflater inflater;
+    @InjectView(R.id.clientPicker)
+    protected Spinner clientPicker;
+    @InjectView(R.id.title)
+    protected EditText titleTextField;
+    @InjectView(R.id.notes)
+    protected EditText notesTextField;
+    @InjectView(R.id.finished)
+    protected ToggleButton finishedToggle;
+    @InjectView(R.id.action_ok)
+    Button okButton;
+    @InjectView(R.id.action_cancel)
+    Button cancelButton;
 
     @Inject
     TaskModel taskModel;
@@ -65,7 +64,8 @@ public abstract class AbstractTaskFragment extends RoboDialogFragment implements
     protected abstract String getTitle();
 
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
+            @Nullable Bundle savedInstanceState) {
         getDialog().setTitle(getTitle());
         return inflater.inflate(R.layout.fragment_edit_task, container);
     }
@@ -76,18 +76,8 @@ public abstract class AbstractTaskFragment extends RoboDialogFragment implements
         mAdapter = new ClientListAdapter(clientModel, inflater);
         clientPicker.setAdapter(mAdapter);
         clientPicker.setOnItemSelectedListener(this);
-        okButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onSave();
-            }
-        });
-        cancelButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dismiss();
-            }
-        });
+        okButton.setOnClickListener(v -> onSave());
+        cancelButton.setOnClickListener(v -> dismiss());
     }
 
     @Override
@@ -120,8 +110,9 @@ public abstract class AbstractTaskFragment extends RoboDialogFragment implements
         String title = titleTextField.getText().toString();
         title = title == null ? "" : title.trim();
         boolean canSave = !title.isEmpty() && task != null;
-//        getNavigationItem().getRightBarButtonItem().setEnabled(canSave);
+        //        getNavigationItem().getRightBarButtonItem().setEnabled(canSave);
     }
+
     protected void updateViewValuesWithTask(Task task) {
         client = task == null ? null : task.getClient();
         int selectedRow = 0;
@@ -137,7 +128,7 @@ public abstract class AbstractTaskFragment extends RoboDialogFragment implements
         //clientTextField.setText(task == null ? "" : task.getClient().getName());
         titleTextField.setText(task == null ? "" : task.getTitle());
         notesTextField.setText(task == null ? "" : task.getNotes());
-        finishedToggle.setChecked(task == null ? false : task.isFinished());
+        finishedToggle.setChecked(task != null && task.isFinished());
         updateSaveButtonEnabled();
     }
 
@@ -147,7 +138,7 @@ public abstract class AbstractTaskFragment extends RoboDialogFragment implements
         String notes = notesTextField.getText().toString();
         notes = notes == null ? "" : notes.trim();
 
-        Client client = clientModel.get((int) clientPicker.getSelectedItemPosition());
+        Client client = clientModel.get(clientPicker.getSelectedItemPosition());
         task.setClient(client);
         task.setTitle(title);
         task.setNotes(notes);

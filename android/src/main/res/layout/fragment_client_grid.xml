@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="org.robovm.samples.contractr.android.ClientsFragment">
+    tools:context="org.robovm.samples.contractr.android.fragment.ClientsFragment">
 
     <GridView
         android:id="@android:id/list"

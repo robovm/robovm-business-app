@@ -1,21 +1,18 @@
-package org.robovm.samples.contractr.android;
-
+package org.robovm.samples.contractr.android.fragment;
 
 import android.app.Fragment;
-
 
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link EditClientFragment#newInstance} factory method to
  * create an instance of this fragment.
- *
  */
 public class EditClientFragment extends AbstractClientFragment {
 
     public static EditClientFragment newInstance() {
-        EditClientFragment fragment = new EditClientFragment();
-        return fragment;
+        return new EditClientFragment();
     }
+
     public EditClientFragment() {
         // Required empty public constructor
     }
@@ -30,5 +27,4 @@ public class EditClientFragment extends AbstractClientFragment {
         clientModel.save(saveViewValuesToClient(client));
         super.onSave();
     }
-
 }

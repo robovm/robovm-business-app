@@ -1,12 +1,8 @@
-package org.robovm.samples.contractr.android;
+package org.robovm.samples.contractr.android.fragment;
 
 import org.robovm.samples.contractr.core.Task;
 
-/**
- * Created by henric on 2014-09-27.
- */
 public class AddTaskFragment extends AbstractTaskFragment {
-
     public static AddTaskFragment newInstance() {
         return new AddTaskFragment();
     }
@@ -24,5 +20,4 @@ public class AddTaskFragment extends AbstractTaskFragment {
         taskModel.save(task);
         super.onSave();
     }
-
 }

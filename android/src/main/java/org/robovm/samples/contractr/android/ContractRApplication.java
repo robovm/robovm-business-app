@@ -19,8 +19,6 @@ public class ContractRApplication extends Application {
      */
     public static final boolean PRELOAD_DATA = true;
 
-    public static final int HIGHLIGHT_COLOR = Color.argb(255, 0x93, 0xc6, 0x23);
-
     private ClientModel clientModel;
     private TaskModel taskModel;
 

@@ -5,6 +5,15 @@
     <string name="title_section_work">Work</string>
     <string name="title_section_clients">Clients</string>
     <string name="title_section_tasks">Tasks</string>
+    <string name="drawer_open">Open</string>
+    <string name="drawer_close">Close</string>
+
+    <string-array name="nav_drawer_labels">
+        <item>@string/title_section_work</item>
+        <item>@string/title_section_clients</item>
+        <item>@string/title_section_tasks</item>
+    </string-array>
+
     <string name="hello_world">Hello world!</string>
     <string name="action_add">Add</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>

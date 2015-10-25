@@ -1,16 +1,13 @@
-package org.robovm.samples.contractr.android;
+package org.robovm.samples.contractr.android.fragment;
 
 import android.app.Fragment;
 
 import org.robovm.samples.contractr.core.Client;
 
-
 /**
  * A simple {@link Fragment} subclass.
- *
  */
 public class AddClientFragment extends AbstractClientFragment {
-
 
     public AddClientFragment() {
         // Required empty public constructor

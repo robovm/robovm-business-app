@@ -1,70 +1,126 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="org.robovm.samples.contractr.android.WorkFragment"
-    android:orientation="vertical">
-
-    <TextView
+<LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        tools:context="org.robovm.samples.contractr.android.fragment.WorkFragment"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:text="Current task"
-        android:layout_marginTop="60dp"
-        android:layout_marginBottom="10dp"
-        android:gravity="center_horizontal" />
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="Company Inc"
-        android:layout_marginBottom="20dp"
-        android:id="@+id/currentTaskLabel"
-        android:gravity="center_horizontal" />
+    <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/taskLayout"
+            android:layout_weight="2">
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:text="Time elapsed"
-        android:layout_marginTop="30dp"
-        android:layout_marginBottom="10dp"
-        android:gravity="center_horizontal" />
+        <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_centerInParent="true">
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="00:00:00"
-        android:id="@+id/timerLabel"
-        android:gravity="center_horizontal" />
+            <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:text="Current task"
+                    android:layout_marginBottom="10dp"
+                    android:gravity="center_horizontal"/>
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:text="Time elapsed"
-        android:layout_marginTop="20dp"
-        android:layout_marginBottom="10dp"
-        android:gravity="center_horizontal" />
+            <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:text="Do stuff fast!"
+                    android:id="@+id/currentTaskLabel"
+                    android:gravity="center_horizontal"/>
+        </LinearLayout>
+    </RelativeLayout>
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="$ 00.00"
-        android:id="@+id/amountEarned"
-        android:gravity="center_horizontal" />
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="#eeeeee"
+            android:layout_weight="3"
+            android:padding="8dp">
 
-    <Button
-        android:layout_width="148dp"
-        android:layout_height="wrap_content"
-        android:text="Start"
-        android:layout_marginTop="50dp"
-        android:id="@+id/startStopButton"
-        android:layout_gravity="center_horizontal"
-        android:background="@drawable/start_button"/>
+        <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1">
 
+            <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_centerInParent="true">
+
+                <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:text="Time elapsed"
+                        android:layout_marginBottom="10dp"
+                        android:gravity="center_horizontal"/>
+
+                <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceLarge"
+                        android:text="00:00:00"
+                        android:textStyle="bold"
+                        android:id="@+id/timerLabel"
+                        android:gravity="center_horizontal"/>
+            </LinearLayout>
+        </RelativeLayout>
+
+        <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@android:color/darker_gray"/>
+
+        <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1">
+
+            <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_centerInParent="true">
+
+                <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:text="Amount earned"
+                        android:layout_marginBottom="10dp"
+                        android:gravity="center_horizontal"/>
+
+                <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceLarge"
+                        android:text="$0"
+                        android:textStyle="bold"
+                        android:id="@+id/amountEarned"
+                        android:gravity="center_horizontal"/>
+            </LinearLayout>
+        </RelativeLayout>
+
+        <View style="@style/Separator"/>
+
+        <ToggleButton
+                style="@style/ToggleButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Start work"
+                android:textOn="Start Work"
+                android:textOff="Stop Work"
+                android:layout_marginTop="10dp"
+                android:id="@+id/startStopButton"
+                android:layout_gravity="center_horizontal"/>
+    </LinearLayout>
 
 </LinearLayout>
