@@ -12,6 +12,7 @@
   <forceLinkClasses>
     <pattern>SQLite.**</pattern>
     <pattern>org.robovm.samples.contractr.**</pattern>
+    <pattern>dagger.**</pattern>
   </forceLinkClasses>
   <frameworks>
     <framework>CoreGraphics</framework>
